@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="reset.css">
+        <link rel="stylesheet" href="stylefortetra.css">
+        <title>E-sports of Tetra</title> 
+    </head>
+    <style>
+        @charset "UTF-8";
+         /***** 全体に関する装飾 ******/
+
+         body {
+            background-color: #000000;
+            font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            text-align: center;
+        }
+
+        /***** メイン部の装飾 ******/
+        h1 {
+             font-size: 48px;
+             font-family:Georgia, 'Times New Roman', Times, serif;
+             padding: 1px 0;
+             flex-direction: column;
+             justify-content:center;
+             margin: 25px;
+             margin-left: auto;
+             margin-right: auto;
+             width: 1200px;
+             text-align: center;
+             font-weight: bold;
+             color: #ffffff;
+        }
+            
+        h2 {
+            font-size: 27px;
+            margin: 22px auto;
+            text-align: start;
+            width: 950px;
+            color: #ffffff;
+        }
+
+        h3 {
+            font-size: 17px;
+            margin: 10px auto;
+            width: 870px;
+            color: #ffffff;
+            text-align:justify;
+        }
+
+        h5, h6 {
+            font-size: 23px;
+            color: #ffffff;
+            margin: 0 auto;
+        }
+
+        .slider {
+            position: relative;
+            width: 680px;
+            height: 296px;
+            margin: auto;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .slides {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .slides img {
+            width: 680px;
+            height: 296px;
+        }
+
+        .prev, .next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            font-size: 24px;
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .prev {
+            left: 0;
+        }
+
+        .next {
+            right: 0;
+        }
+
+    </style>
+    <body>
+        <h1>The Section of "E-sports"</h1>
+        <img src="../atsuhito/Downloads/official_logo_sq_ske_white.png" width="13%" alt="activetitle">
+        <br>
+        <h5>Tetraの活動内容の1つ「E-sports」について紹介します!</h5><br>
+        <h2>1. E-sportsについて</h2>
+        <h3>そもそもE-sportsとは「Electronic Sports」の略称でコンピュータゲームやスマホゲームを用いて行う一種の対戦競技です。主なゲームとしてはFPS「Apex Legends,VALORANT」、MOBA「Dota2,League of Legends」パズルゲーム「ぷよぷよ,TETRIS」等があり多種多様なゲームをプレイすることが出来ます。また、E-sportsは世界規模で大会が開かれることもあります。その大会賞金は億単位に上るほどその熱は収まることを知りません！</h3>
+        <br><br>
+        <h2>2. E-sports部門の活動内容</h2>
+        <h3>Ⅰ：サークル内でゲームの実力を上げる or ゲームに親しむ<br>
+            実際に皆でゲームをプレイしてレベルアップしていきます。大乱闘スマッシュブラザーズやVALORANTなどのシューティングゲームは勿論、ぷよテトなどの頭脳系ゲームなど幅広く用意しているので、自分の得意な分野を極めることや新しい分野を始めたりすることもできます！<br>
+            <br>
+            Ⅱ:外部のE-sports大会に参加する<br>
+            サークル活動で磨いた力を外部の大会への参戦を通じて実力を発揮または向上させます。皆で協力して戦略を立てたりしていくため、ゲーム初心者の方でも大歓迎です！<br>
+            詳細はInformationまで!!<br>
+            <br>
+            Ⅲ：学内大会の開催<br>
+            Tetraではサークル部員、また部員ではない人との交流の機会やサークルの雰囲気を知ってもらいゲームの魅力を共有するなどの目的のため「学内大会」を実施予定です！少しでも興味ある方はぜひ足を運んでみてください！<br>
+            詳しくはInformationまで!!
+        </h3>
+        <br><br>
+
+        <h2>4. 活動風景</h2>
+        <h3>実際に活動している様子です！後日更新予定です！</h3>
+
+        <div class="slider">
+            <div class="slides">
+                <img src="../atsuhito/Downloads/image10.jpeg" alt="active00">
+                <img src="../atsuhito/Downloads/image4.jpeg" alt="active01">
+                <img src="../atsuhito/Downloads/image6.jpg" alt="active02">
+                <img src="../atsuhito/Downloads/image7.jpg" alt="active03">
+                <img src="../atsuhito/Downloads/image9.jpeg" alt="active04">
+            </div>
+            <button class="prev" onclick="prevSlide()">&#10094;</button>
+            <button class="next" onclick="nextSlide()">&#10095;</button>
+        </div>
+
+        <script>
+            let slideIndex = 0;
+            const slides = document.querySelector('.slides');
+            const totalSlides = slides.children.length;
+
+            function showSlide(index) {
+                if (index >= totalSlides) {
+                    slideIndex = 0;
+                } else if (index < 0) {
+                    slideIndex = totalSlides - 1;
+                } else {
+                    slideIndex = index;
+                }
+                const slideWidth = slides.children[0].offsetWidth;
+                slides.style.transform = `translateX(${-slideIndex * slideWidth}px)`;
+            }
+
+            function nextSlide() {
+                showSlide(slideIndex + 1);
+            }
+
+            function prevSlide() {
+                showSlide(slideIndex - 1);
+            }
+
+            setInterval(nextSlide, 5000); // 5秒ごとに自動でスライド
+        </script>
+
+        <br><br>
+        <h2>5. SNS</h2>
+        <h3>日々の活動の様子などはここから見ることが出来ます！ 以下のリンクから見てみて下さい！</h3>
+        <a href="https://www.instagram.com/tetra.00000100/">
+            <img src="../atsuhito/Downloads/Instagram　ロゴ/02 White Glyph/Instagram_Glyph_White.png" width="4%" alt="Tetraofinstagram">
+        </a>
+
+        <br><br><br><br><br><br>
+        <h5>【Tetra E-sports部門でお待ちしています ! 】</h5>
+        <footer>
+            <br><br>
+            <h7>情報科学系サークル Tetra</h7>
+        </footer>
+        <div class="Black"></div>
+    </body>
+</html>
