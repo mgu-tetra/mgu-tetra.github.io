@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tetra | Meiji Gakuin University</title>
+    <style>
+        /* --- 基本設定 (ミニマル・クリーン) --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+            background-color: #ffffff;
+            color: #333333;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: opacity 0.2s;
+        }
+
+        a:hover {
+            opacity: 0.7;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        /* --- ヘッダー --- */
+        header {
+            background-color: #fff;
+            border-bottom: 1px solid #e0e0e0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* ロゴ (Tetraブランドカラーの黒背景) */
+        .logo-box {
+            background-color: #000;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-box img {
+            width: 80%;
+            height: auto;
+        }
+
+        /* ナビゲーション */
+        .main-nav ul {
+            display: flex;
+            gap: 30px;
+        }
+
+        .main-nav a {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* 検索 (見た目だけのUI) */
+        .search-container {
+            display: flex;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 2px;
+        }
+
+        .search-container input {
+            border: none;
+            outline: none;
+            font-size: 12px;
+            width: 150px;
+        }
+
+        .search-icon {
+            font-size: 12px;
+            color: #666;
+            cursor: default;
+        }
+
+        /* --- メインビジュアル --- */
+        .hero {
+            background-color: #f9f9f9;
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            letter-spacing: 0.05em;
+            color: #000;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: #555;
+            font-weight: 300;
+        }
+
+        /* --- コンテンツエリア --- */
+        .container {
+            max-width: 1200px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #000;
+            display: inline-block;
+        }
+
+        /* --- News リスト --- */
+        .news-section {
+            margin-bottom: 80px;
+        }
+
+        .news-list {
+            border-top: 1px solid #eee;
+        }
+
+        .news-item {
+            border-bottom: 1px solid #eee;
+        }
+
+        .news-item a {
+            display: flex;
+            padding: 15px 0;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .news-date {
+            width: 100px;
+            font-size: 14px;
+            color: #888;
+            font-family: Georgia, serif;
+        }
+
+        .news-tag {
+            background-color: #f0f0f0;
+            font-size: 11px;
+            padding: 3px 8px;
+            margin-right: 15px;
+            border-radius: 2px;
+            color: #555;
+        }
+
+        .news-title {
+            flex: 1;
+            font-size: 15px;
+            color: #333;
+        }
+
+        /* --- Departments (2カラムへ変更) --- */
+        .departments-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 2列に変更 */
+            gap: 40px;
+            max-width: 900px; /* カードが広がりすぎないように制限 */
+            margin: 0 auto;
+        }
+
+        .dept-card {
+            background: #fff;
+        }
+
+        .dept-image {
+            width: 100%;
+            height: 250px; /* 少し高さを増やしてバランス調整 */
+            background-color: #eee;
+            object-fit: cover;
+            margin-bottom: 15px;
+        }
+
+        .dept-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .dept-desc {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .dept-link {
+            font-size: 12px;
+            font-weight: bold;
+            text-decoration: underline;
+        }
+
+        /* --- フッター --- */
+        footer {
+            background-color: #f5f5f5;
+            padding: 50px 0 20px;
+            margin-top: 80px;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .social-links img {
+            width: 24px;
+            height: auto;
+            filter: grayscale(100%); /* アイコンをグレーにして落ち着かせる */
+            transition: filter 0.3s;
+        }
+
+        .social-links img:hover {
+            filter: grayscale(0%);
+        }
+
+        .copyright {
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+            display: inline-block;
+            width: 80%;
+        }
+
+        /* --- レスポンシブ対応 --- */
+        @media screen and (max-width: 768px) {
+            .departments-grid {
+                grid-template-columns: 1fr;
+            }
+            .header-inner {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .main-nav ul {
+                gap: 15px;
+                font-size: 12px;
+            }
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-inner">
+            <a href="index.html" class="logo-box">
+                <img src="./images/official_logo_sq_ske_white.png" alt="Tetra">
+            </a>
+
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="index.html">HOME</a></li>
+                    <li><a href="./tetra_coming-soon/tetra_coming-soon.html">PROGRAMMING</a></li>
+                    <li><a href="./tetra_coming-soon/tetra_coming-soon.html">GRAPHICS</a></li>
+                </ul>
+            </nav>
+
+            <div class="search-container">
+                <input type="text" placeholder="Search">
+                <span class="search-icon">🔍</span>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>TETRA</h1>
+            <p>MEIJI GAKUIN UNIVERSITY<br>Information Science Circle</p>
+        </section>
+
+        <div class="container">
+            <section class="news-section">
+                <h2 class="section-title">NEWS</h2>
+                <ul class="news-list">
+                    <li class="news-item">
+                        <a href="./tetra_coming-soon/tetra_coming-soon.html">
+                            <span class="news-date">2024.10.07</span>
+                            <span class="news-tag">お知らせ</span>
+                            <span class="news-title">Webサイトをリニューアルしました</span>
+                        </a>
+                    </li>
+                    <li class="news-item">
+                        <a href="./tetra_coming-soon/tetra_coming-soon.html">
+                            <span class="news-date">2024.09.27</span>
+                            <span class="news-tag">イベント</span>
+                            <span class="news-title">サークル長からのご挨拶</span>
+                        </a>
+                    </li>
+                    <li class="news-item">
+                        <a href="./tetra_coming-soon/tetra_coming-soon.html">
+                            <span class="news-date">2024.09.20</span>
+                            <span class="news-tag">重要</span>
+                            <span class="news-title">新サークル『Tetra』活動開始</span>
+                        </a>
+                    </li>
+                </ul>
+            </section>
+
+            <section class="departments-section">
+                <h2 class="section-title">DEPARTMENTS</h2>
+                <div class="departments-grid">
+                    <div class="dept-card">
+                        <a href="./tetra_coming-soon/tetra_coming-soon.html">
+                            <img src="./images/image6.jpg" alt="Programming" class="dept-image">
+                            <h3 class="dept-name">Programming</h3>
+                            <p class="dept-desc">Web開発、アプリ制作、AI研究など、技術を通じて新しい価値を創造します。</p>
+                            <span class="dept-link">VIEW MORE</span>
+                        </a>
+                    </div>
+                    
+                    <div class="dept-card">
+                        <a href="./tetra_coming-soon/tetra_coming-soon.html">
+                            <img src="./images/image7.jpg" alt="Graphics" class="dept-image">
+                            <h3 class="dept-name">Graphics</h3>
+                            <p class="dept-desc">デザイン、映像編集、プロジェクションマッピングなど、視覚表現を追求します。</p>
+                            <span class="dept-link">VIEW MORE</span>
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="social-links">
+            <a href="https://www.instagram.com/tetra.00000100/">
+                <img src="./images/Instagram_Glyph_White.png" alt="Instagram">
+            </a>
+            <a href="https://x.com/Tetra00000100">
+                <img src="./images/x_logo-white.png" alt="X">
+            </a>
+            <a href="https://www.youtube.com/@Tetra.0100">
+                <img src="./images/youtube_social_square_dark.png" alt="YouTube">
+            </a>
+        </div>
+        <div class="copyright">
+            &copy; 2024 Tetra Meiji Gakuin Univ.
+        </div>
+    </footer>
+
+</body>
+</html>
