@@ -7,10 +7,10 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 
     <style>
-        /* --- Reset & Base (Montserrat & Mono Edition) --- */
+        /* --- Reset & Base (Modern Geometric & Maru Gothic) --- */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -18,13 +18,13 @@
         }
 
         body {
-            /* メインフォントをMontserratに変更 */
-            font-family: 'Montserrat', "Helvetica Neue", Arial, sans-serif;
+            /* ベースはZen丸ゴシックで親しみやすく現代的に */
+            font-family: 'Zen Maru Gothic', sans-serif;
             background-color: #000000;
             color: #cccccc;
             line-height: 1.8;
             -webkit-font-smoothing: antialiased;
-            letter-spacing: 0.02em; /* Montserratは元々幅が広いので少し詰める */
+            letter-spacing: 0.04em;
         }
 
         a {
@@ -35,7 +35,7 @@
 
         a:hover {
             color: #FFE81F;
-            text-shadow: 0 0 15px rgba(255, 232, 31, 0.5);
+            text-shadow: 0 0 10px rgba(255, 232, 31, 0.4);
         }
 
         ul {
@@ -47,11 +47,11 @@
             display: block;
         }
 
-        /* --- Utility: Monospace Font Class --- */
-        /* 数字や日付など、技術的な箇所に適用 */
-        .font-mono {
-            font-family: 'Roboto Mono', monospace;
-            letter-spacing: -0.05em;
+        /* --- Typography Utility --- */
+        
+        /* 英語箇所（Google Sans風）: Outfit */
+        .font-eng {
+            font-family: 'Outfit', sans-serif;
         }
 
         /* --- Header --- */
@@ -74,23 +74,41 @@
         }
 
         .nav-link {
-            font-size: 18px;
-            font-weight: 900; /* Extra Boldでインパクトを出す */
+            font-family: 'Outfit', sans-serif; /* 英語フォント */
+            font-size: 18px; 
+            font-weight: 700; /* Boldで視認性アップ */
             color: #aaaaaa;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
             width: 220px;
             text-align: center;
+            position: relative;
+            letter-spacing: 0.05em;
+        }
+        
+        /* 丸ゴシックに合わせて下線も少し丸く */
+        .nav-link::after {
+            content: '';
+            display: block;
+            width: 0%;
+            height: 3px;
+            background-color: #FFE81F;
+            margin: 5px auto 0;
+            transition: width 0.3s;
+            border-radius: 2px;
+        }
+
+        .nav-link:hover::after {
+            width: 50%;
         }
         
         .logo-box {
             background-color: #000;
-            width: 80px;
-            height: 80px;
+            width: 90px;
+            height: 90px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 40px;
+            margin: 0 50px;
         }
 
         .logo-box img {
@@ -111,10 +129,11 @@
         }
 
         .hero img {
-            width: 60%;
-            max-width: 700px;
+            width: 65%;
+            max-width: 750px;
             height: auto;
-            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.05));
+            /* 丸ゴシックの柔らかさに合わせて影も少しソフトに */
+            filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.05));
         }
 
         /* --- News Ticker --- */
@@ -138,21 +157,20 @@
         }
 
         .ticker-label {
-            font-family: 'Montserrat', sans-serif; /* あえてサンセリフで強く */
-            font-size: 18px;
-            font-weight: 900; /* 太字強調 */
+            font-family: 'Outfit', sans-serif;
+            font-size: 20px;
+            font-weight: 900; /* ExtraBold */
             color: #FFE81F;
             margin-right: 30px;
             text-transform: uppercase;
             white-space: nowrap;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.05em;
         }
 
         .ticker-list-wrapper {
             height: 60px;
             overflow: hidden;
             flex-grow: 1;
-            position: relative;
         }
 
         .ticker-list {
@@ -163,19 +181,19 @@
             height: 60px;
             display: flex;
             align-items: center;
-            font-size: 16px;
-            color: #dddddd;
             width: 100%;
-            font-weight: 500;
+            font-family: 'Zen Maru Gothic', sans-serif;
+            font-weight: 500; /* 少し太めにしてポップさを出す */
+            font-size: 15px;
+            color: #dddddd;
         }
 
-        /* 日付は等幅フォント(Roboto Mono)にしてテック感を出す */
         .ticker-date {
-            font-family: 'Roboto Mono', monospace;
+            font-family: 'Outfit', sans-serif; /* 数字は欧文フォントで */
             color: #888888;
             margin-right: 20px;
             font-size: 14px;
-            letter-spacing: 0;
+            font-weight: 700;
         }
 
         @keyframes slideUp {
@@ -201,59 +219,62 @@
         }
 
         .section-title {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 28px; /* フォント変更に伴いサイズ微調整 */
-            font-weight: 900; /* Extra Bold */
+            font-family: 'Outfit', sans-serif;
+            font-size: 32px;
+            font-weight: 900;
             text-transform: uppercase;
-            margin-bottom: 40px;
-            letter-spacing: 0.1em;
+            margin-bottom: 50px;
             text-align: center;
             color: #FFE81F;
-            border-bottom: 3px solid #333; /* 線をより太く */
-            padding-bottom: 15px;
+            border-bottom: 3px solid #333; /* 丸みに合わせて太く */
+            padding-bottom: 20px;
+            letter-spacing: 0.1em;
+            border-radius: 2px; /* 線の端を少し丸める */
         }
 
         /* --- Departments (Grid) --- */
         .departments-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 40px;
+            gap: 50px;
         }
 
         .dept-card {
             cursor: pointer;
-            background-color: #000;
+            background-color: transparent;
         }
 
         .dept-image-wrapper {
             overflow: hidden;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             border: 1px solid #333;
+            border-radius: 8px; /* 丸ゴシックに合わせて角丸を追加 */
+            position: relative;
         }
 
         .dept-image {
             width: 100%;
-            height: 350px;
+            height: 380px;
             object-fit: cover;
             background-color: #111;
-            transition: transform 0.5s ease, filter 0.5s;
+            transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), filter 0.6s;
             filter: grayscale(100%);
         }
 
         .dept-card:hover .dept-image {
-            transform: scale(1.03);
+            transform: scale(1.05);
             filter: grayscale(0%);
         }
 
         .dept-name {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 24px;
-            font-weight: 900; /* ここも太く */
+            font-family: 'Outfit', sans-serif;
+            font-size: 26px;
+            font-weight: 900;
             margin-bottom: 10px;
-            letter-spacing: 0.05em;
             text-transform: uppercase;
             color: #ffffff;
             transition: color 0.3s;
+            letter-spacing: 0.05em;
         }
         
         .dept-card:hover .dept-name {
@@ -261,43 +282,45 @@
         }
 
         .dept-desc {
+            font-family: 'Zen Maru Gothic', sans-serif;
             font-size: 14px;
+            font-weight: 500;
             color: #999999;
-            line-height: 1.8;
+            line-height: 2;
             margin-bottom: 0;
-            font-weight: 400;
         }
 
         /* --- Footer --- */
         footer {
-            padding: 60px 0 30px;
+            padding: 80px 0 40px;
             text-align: center;
-            background-color: #080808;
+            background-color: #050505;
             border-top: 1px solid #333;
-            margin-top: 100px;
+            margin-top: 120px;
         }
 
         .social-links {
             display: flex;
             justify-content: center;
-            gap: 30px;
-            margin-bottom: 30px;
+            gap: 40px;
+            margin-bottom: 40px;
         }
 
         .social-links img {
-            width: 24px;
+            width: 28px;
             height: auto;
-            opacity: 0.6;
-            transition: opacity 0.3s;
+            opacity: 0.5;
+            transition: opacity 0.3s, transform 0.3s;
         }
         
         .social-links img:hover {
             opacity: 1;
+            transform: translateY(-3px);
         }
 
         .copyright {
-            font-family: 'Roboto Mono', monospace; /* コピーライトも等幅で */
-            font-size: 11px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 12px;
             color: #555555;
             letter-spacing: 0.05em;
         }
@@ -306,20 +329,22 @@
         @media screen and (max-width: 900px) {
             .header-inner {
                 flex-direction: column;
-                gap: 20px;
+                gap: 25px;
             }
-            .logo-box { order: 1; margin: 0; }
+            .logo-box { order: 1; margin: 0; width: 70px; height: 70px; }
             .nav-link:first-child { order: 2; }
             .nav-link:last-child { order: 3; }
             
             .hero { height: 40vh; }
-            .hero img { width: 80%; }
+            .hero img { width: 85%; }
             
-            .departments-grid { grid-template-columns: 1fr; gap: 40px; }
+            .departments-grid { grid-template-columns: 1fr; gap: 60px; }
+            .dept-image { height: 300px; }
             
             .news-ticker { height: 50px; }
-            .ticker-item { height: 50px; font-size: 14px; }
+            .ticker-item { height: 50px; font-size: 13px; }
             .ticker-list-wrapper { height: 50px; }
+            .ticker-label { font-size: 16px; margin-right: 15px; }
             
             @keyframes slideUp {
                 0%, 25% { transform: translateY(0); }
