@@ -1,255 +1,32 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Graphics | Tetra</title>
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap"
+        rel="stylesheet">
 
-    <style>
-        /* --- Common Base Styles (共通) --- */
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: "Google Sans", "Zen Maru Gothic", sans-serif;
-            font-optical-sizing: auto;
-            font-variation-settings: "GRAD" 0;
-            background-color: #000000;
-            color: #cccccc;
-            line-height: 1.8;
-            -webkit-font-smoothing: antialiased;
-            letter-spacing: 0.04em;
-        }
-        @media (prefers-color-scheme: dark) { body { font-variation-settings: "GRAD" 50; } }
-        a { text-decoration: none; color: inherit; transition: color 0.3s ease, text-shadow 0.3s ease; }
-        a:hover { color: #FFE81F; text-shadow: 0 0 10px rgba(255, 232, 31, 0.4); }
-        ul { list-style: none; }
-        img { max-width: 100%; display: block; }
-
-        /* --- Header (共通デザイン) --- */
-        header {
-            background-color: #000000;
-            padding: 20px 40px; 
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            border-bottom: 1px solid #333;
-        }
-        .header-inner {
-            max-width: 100%;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            align-items: center;
-            position: relative;
-        }
-        .nav-link {
-            font-family: "Google Sans", sans-serif;
-            font-size: 56px;
-            font-weight: 700;
-            line-height: 1;
-            color: #aaaaaa;
-            text-transform: uppercase;
-            width: auto;
-            position: relative;
-            letter-spacing: 0.02em;
-            white-space: nowrap;
-        }
-        .nav-link:first-child { justify-self: start; text-align: left; }
-        .nav-link:last-child { justify-self: end; text-align: right; }
-        
-        .nav-link::after {
-            content: ''; display: block; width: 0%; height: 6px;
-            background-color: #FFE81F; margin: 0 auto;
-            transition: width 0.3s; border-radius: 4px;
-            position: absolute; bottom: -10px; left: 0; right: 0;
-        }
-        .nav-link:hover::after { width: 100%; }
-
-        /* 現在のページを示すクラス */
-        .nav-link.current { color: #FFE81F; }
-        .nav-link.current::after { width: 100%; }
-
-        .logo-box {
-            background-color: #000;
-            width: 90px; height: 90px;
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 20px;
-            /* 下層ページなので最初から表示 */
-            opacity: 1; visibility: visible;
-        }
-        .logo-box img { width: 100%; height: auto; }
-
-        /* --- Page Content Specifics --- */
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
-
-        /* Page Hero */
-        .page-hero {
-            padding: 120px 0 80px;
-            border-bottom: 1px solid #333;
-            margin-bottom: 80px;
-        }
-        .page-title {
-            font-family: "Google Sans", sans-serif;
-            font-size: 80px;
-            font-weight: 700;
-            color: #fff;
-            line-height: 1;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-        }
-        .page-desc {
-            font-size: 18px;
-            max-width: 600px;
-            color: #999;
-        }
-
-        /* Tech Stack (Tag style) */
-        .tech-stack {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-top: 40px;
-        }
-        .tech-tag {
-            font-family: "Google Sans", sans-serif;
-            font-weight: 500;
-            font-size: 14px;
-            padding: 8px 20px;
-            border: 1px solid #444;
-            border-radius: 50px;
-            color: #FFE81F;
-            transition: background 0.3s, color 0.3s;
-        }
-        .tech-tag:hover {
-            background-color: #FFE81F;
-            color: #000;
-        }
-
-        /* Projects Grid */
-        .works-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 40px;
-            margin-bottom: 120px;
-        }
-        .work-card {
-            border: 1px solid #333;
-            border-radius: 8px;
-            overflow: hidden;
-            background-color: #0a0a0a;
-            transition: transform 0.3s, border-color 0.3s;
-        }
-        .work-card:hover {
-            transform: translateY(-5px);
-            border-color: #555;
-        }
-        .work-image {
-            width: 100%;
-            height: 250px;
-            background-color: #222;
-            object-fit: cover;
-            border-bottom: 1px solid #333;
-        }
-        .work-content {
-            padding: 25px;
-        }
-        .work-title {
-            font-family: "Google Sans", sans-serif;
-            font-size: 24px;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 10px;
-        }
-        .work-text {
-            font-size: 14px;
-            color: #999;
-            margin-bottom: 20px;
-            line-height: 1.6;
-        }
-        .work-links {
-            display: flex;
-            gap: 20px;
-            font-family: "Google Sans", sans-serif;
-            font-size: 14px;
-            font-weight: 700;
-        }
-        .work-link-item {
-            color: #FFE81F;
-            border-bottom: 1px solid transparent;
-        }
-        .work-link-item:hover {
-            border-bottom-color: #FFE81F;
-        }
-
-        /* Section Header */
-        h2.section-head {
-            font-family: "Google Sans", sans-serif;
-            font-size: 40px;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 40px;
-            display: flex;
-            align-items: center;
-        }
-        h2.section-head::before {
-            content: '';
-            display: inline-block;
-            width: 10px; height: 40px;
-            background-color: #FFE81F;
-            margin-right: 20px;
-        }
-
-        /* Footer (共通) */
-        footer {
-            padding: 80px 0 40px;
-            text-align: center;
-            background-color: #050505;
-            border-top: 1px solid #333;
-        }
-        .social-links {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin-bottom: 40px;
-        }
-        .social-links img {
-            width: 28px; height: auto;
-            opacity: 0.5;
-            transition: opacity 0.3s, transform 0.3s;
-        }
-        .social-links img:hover { opacity: 1; transform: translateY(-3px); }
-        .copyright {
-            font-family: "Google Sans", sans-serif;
-            font-size: 12px; color: #555; letter-spacing: 0.05em;
-        }
-
-        /* Responsive */
-        @media screen and (max-width: 900px) {
-            .header-inner { flex-direction: column; gap: 25px; display: flex; }
-            .logo-box { order: 1; margin: 0; width: 70px; height: 70px; }
-            .nav-link:first-child { order: 2; }
-            .nav-link:last-child { order: 3; }
-            .nav-link { font-size: 32px; }
-            
-            .page-title { font-size: 50px; }
-            .works-grid { grid-template-columns: 1fr; }
-        }
-    </style>
+    <link rel="stylesheet" href="../style/style.css">
 </head>
+
 <body>
 
     <header>
         <div class="header-inner">
-            <a href="../programming/programming.html" class="nav-link">Programming</a>
-            
             <a href="../index.html" class="logo-box">
                 <img src="../images/official_logo_sq_ske_white.png" alt="Tetra">
             </a>
 
-            <a href="graphics.html" class="nav-link current">Graphics</a>
+            <nav class="desktop-nav">
+                <a href="../programming/programming.html" class="nav-link">Programming</a>
+                <a href="graphics.html" class="nav-link current">Graphics</a>
+            </nav>
         </div>
     </header>
 
@@ -317,14 +94,50 @@
         </div>
     </main>
 
+    <!-- Mobile Bottom Navigation -->
+    <nav class="bottom-tab-bar">
+        <a href="../index.html" class="tab-item">
+            <div class="tab-icon">
+                <svg viewBox="0 0 24 24" fill="none" class="icon" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+            </div>
+            <span class="tab-label">Home</span>
+        </a>
+        <a href="../programming/programming.html" class="tab-item">
+            <div class="tab-icon">
+                <svg viewBox="0 0 24 24" fill="none" class="icon" stroke="currentColor" stroke-width="2">
+                    <polyline points="16 18 22 12 16 6"></polyline>
+                    <polyline points="8 6 2 12 8 18"></polyline>
+                </svg>
+            </div>
+            <span class="tab-label">Dev</span>
+        </a>
+        <a href="graphics.html" class="tab-item active">
+            <div class="tab-icon">
+                <svg viewBox="0 0 24 24" fill="none" class="icon" stroke="currentColor" stroke-width="2">
+                    <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
+                    <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
+                    <path d="M2 2l7.586 7.586"></path>
+                    <circle cx="11" cy="11" r="2"></circle>
+                </svg>
+            </div>
+            <span class="tab-label">Design</span>
+        </a>
+    </nav>
+
     <footer>
         <div class="social-links">
-            <a href="https://www.instagram.com/tetra.00000100/"><img src="../images/Instagram_Glyph_White.png" alt="Instagram"></a>
+            <a href="https://www.instagram.com/tetra.00000100/"><img src="../images/Instagram_Glyph_White.png"
+                    alt="Instagram"></a>
             <a href="https://x.com/Tetra00000100"><img src="../images/x_logo-white.png" alt="X"></a>
-            <a href="https://www.youtube.com/@Tetra.0100"><img src="../images/youtube_social_square_dark.png" alt="YouTube" style="filter: invert(1);"></a>
+            <a href="https://www.youtube.com/@Tetra.0100"><img src="../images/youtube_social_square_dark.png"
+                    alt="YouTube" style="filter: invert(1);"></a>
         </div>
         <p class="copyright">&copy; 2024 Tetra Meiji Gakuin Univ.</p>
     </footer>
 
 </body>
+
 </html>
