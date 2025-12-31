@@ -1,27 +1,32 @@
 /* --- Variables & Apple HIG Colors --- */
 :root {
     --bg-color: #000000;
-    --card-bg: #1C1C1E;
-    /* System Gray 6 Dark */
+
+    /* Liquid Glass Variables */
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    --glass-highlight: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+
+    /* Text Colors */
     --text-primary: #FFFFFF;
-    --text-secondary: #8E8E93;
-    /* System Gray */
+    --text-secondary: rgba(235, 235, 245, 0.6);
+    /* iOS System Gray 6 */
+
+    /* System Colors */
     --accent-color: #0A84FF;
-    /* System Blue Dark - Tech/Clean feel */
+    /* iOS Blue */
     --accent-highlight: #5E5CE6;
-    /* System Indigo */
-    --border-color: #38383A;
+    /* iOS Indigo */
 
-    --font-main: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+    --font-main: -apple-system, BlinkMacSystemFont, "Inter", "SF Pro Text", sans-serif;
+    --font-display: -apple-system, BlinkMacSystemFont, "Inter", "SF Pro Display", sans-serif;
 
+    --radius-xl: 32px;
+    /* For Cards (Squircle-ish) */
     --radius-l: 22px;
-    --radius-m: 16px;
-    --radius-s: 10px;
-
     --header-height: 60px;
     --tab-bar-height: 84px;
-    /* Includes safe area padding */
 }
 
 /* --- Reset & Base --- */
@@ -61,7 +66,12 @@ h3 {
     font-family: var(--font-display);
     font-weight: 700;
     letter-spacing: -0.02em;
-    /* Tighter tracking for display text */
+    /* Tight tracking for headers */
+}
+
+p {
+    letter-spacing: 0.01em;
+    /* relaxed spacing for body */
 }
 
 /* --- Header & Logo --- */
@@ -70,14 +80,15 @@ header {
     top: 0;
     z-index: 100;
     height: var(--header-height);
-    background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: rgba(20, 20, 20, 0.6);
+    /* Use darker glass for header */
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 20px;
-    border-bottom: 0.5px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid var(--glass-border);
 }
 
 .header-inner {
@@ -246,17 +257,81 @@ header {
 }
 
 .dept-card {
-    background-color: var(--card-bg);
-    border-radius: var(--radius-l);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-highlight), var(--glass-shadow);
+    border-radius: var(--radius-xl);
     overflow: hidden;
     position: relative;
-    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-    /* Apple "squircle" feel via large radius */
+    /* Spring Physics Transition */
+    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s ease;
+
+    /* Spotlight Effect Foundation */
+    --x: 50%;
+    --y: 50%;
+
+    /* 3D Tilt Setup */
+    transform-style: preserve-3d;
+    transform: perspective(1000px);
+}
+
+/* Scroll Reveal Utilities */
+.reveal-on-scroll {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+    will-change: opacity, transform;
+}
+
+.reveal-on-scroll.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Stagger delays (can be set via inline style or classes) */
+.delay-100 {
+    transition-delay: 0.1s;
+}
+
+.delay-200 {
+    transition-delay: 0.2s;
+}
+
+.delay-300 {
+    transition-delay: 0.3s;
+}
+
+/* Spotlight Gradient Overlay */
+.dept-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    background: radial-gradient(600px circle at var(--x) var(--y),
+            rgba(255, 255, 255, 0.06),
+            transparent 40%);
+    z-index: 2;
+    opacity: 0;
+    /* Hidden by default until JS enables it or hover */
+    transition: opacity 0.3s;
+}
+
+.dept-card:hover::before {
+    opacity: 1;
+}
+
+.dept-card:hover {
+    transform: scale(1.02);
+    box-shadow: var(--glass-highlight), 0 20px 40px rgba(0, 0, 0, 0.5);
+    z-index: 10;
 }
 
 .dept-card:active {
-    transform: scale(0.96);
-    /* Tactile feedback */
+    transform: scale(0.98);
 }
 
 .dept-image-wrapper {
@@ -310,11 +385,10 @@ header {
     left: 0;
     width: 100%;
     height: var(--tab-bar-height);
-    background: rgba(28, 28, 30, 0.85);
-    /* Slightly lighter than black */
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
-    border-top: 0.5px solid rgba(255, 255, 255, 0.15);
+    background: var(--glass-bg);
+    backdrop-filter: blur(30px) saturate(180%);
+    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    border-top: 1px solid var(--glass-border);
     display: flex;
     justify-content: space-around;
     align-items: center;
@@ -391,13 +465,19 @@ footer {
     }
 
     .nav-link {
-        font-size: 16px;
+        font-size: 15px;
         font-weight: 600;
         color: var(--text-secondary);
+        padding: 8px 16px;
+        border-radius: 20px;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     }
 
     .nav-link:hover {
+        background: rgba(255, 255, 255, 0.1);
         color: var(--text-primary);
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
     /* Grid Layout */
