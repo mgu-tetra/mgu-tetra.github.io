@@ -24,7 +24,7 @@ const newsItems = [
 
 本年もどうぞよろしくお願いいたします。
         `,
-        url: './campaigns/newyear2026.html'
+        url: './greeting_newyear_2026.html'
     },
     {
         id: 'website-renewal',
