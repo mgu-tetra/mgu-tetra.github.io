@@ -94,4 +94,32 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    /* --- 5. Mobile Hamburger Menu --- */
+    const hamburgerBtn = document.querySelector('.hamburger-btn');
+    const mobileNavOverlay = document.querySelector('.mobile-nav-overlay');
+    const mobileLinks = document.querySelectorAll('.mobile-link');
+
+    if (hamburgerBtn && mobileNavOverlay) {
+        hamburgerBtn.addEventListener('click', () => {
+            hamburgerBtn.classList.toggle('is-active');
+            mobileNavOverlay.classList.toggle('is-active');
+
+            // Toggle body scroll lock
+            if (mobileNavOverlay.classList.contains('is-active')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
+        });
+
+        // Close menu when a link is clicked
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                hamburgerBtn.classList.remove('is-active');
+                mobileNavOverlay.classList.remove('is-active');
+                document.body.style.overflow = '';
+            });
+        });
+    }
+
 });

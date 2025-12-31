@@ -44,8 +44,7 @@ body {
     font-family: var(--font-main);
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
-    padding-bottom: var(--tab-bar-height);
-    /* Space for bottom nav */
+    /* padding-bottom removed for hamburger menu layout */
 }
 
 a {
@@ -384,54 +383,181 @@ header {
     opacity: 0.9;
 }
 
-/* --- Bottom Tab Bar (Mobile Only) --- */
-.bottom-tab-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: var(--tab-bar-height);
-    background: var(--glass-bg);
-    backdrop-filter: blur(30px) saturate(180%);
-    -webkit-backdrop-filter: blur(30px) saturate(180%);
-    border-top: 1px solid var(--glass-border);
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    padding-bottom: 20px;
-    /* Safe area for home indicator */
-    z-index: 1000;
-}
-
-.tab-item {
+/* --- Hamburger Menu (Mobile) --- */
+.hamburger-btn {
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
-    color: var(--text-secondary);
-    width: 60px;
+    gap: 6px;
+    width: 44px;
+    height: 44px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    z-index: 1001;
+    /* Above overlay */
+    padding: 10px;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
-.tab-item.active {
-    color: var(--accent-color);
+.hamburger-btn .bar {
+    width: 24px;
+    height: 2px;
+    background-color: var(--text-primary);
+    border-radius: 2px;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    align-self: flex-end;
+    /* Right align bars */
 }
 
-.tab-icon {
+/* X Animation State */
+.hamburger-btn.is-active .bar:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+}
+
+.hamburger-btn.is-active .bar:nth-child(2) {
+    transform: translateY(0) rotate(-45deg);
+    /* Merged logic: 2 bars approach */
+}
+
+/* If we only have 2 bars in HTML, we need to adjust logic. 
+   I wrote 2 bars in HTML. Let's adjust CSS for 2 lines.
+   Actually, standard hamburger has 3. But I put 2 in HTML for a modern abstract look (or I can add one).
+   Let's stick to 2 bars for a sleek "Tetra" look? No, standard 3 or 2 is fine. 
+   Let's assume 2 bars transforming into X.
+*/
+
+.hamburger-btn .bar:nth-child(1) {
+    width: 24px;
+}
+
+.hamburger-btn .bar:nth-child(2) {
+    width: 16px;
+    /* Staggered look */
+}
+
+.hamburger-btn.is-active .bar:nth-child(1) {
+    transform: translateY(4px) rotate(45deg);
+    width: 24px;
+}
+
+.hamburger-btn.is-active .bar:nth-child(2) {
+    transform: translateY(-4px) rotate(-45deg);
+    width: 24px;
+    /* Make same width for X */
+}
+
+/* Mobile Nav Overlay */
+.mobile-nav-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    /* Dim background */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 1000;
+    display: none;
+    /* Changed to display: none to prevent layout issues */
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.mobile-nav-overlay.is-active {
+    display: block;
+    opacity: 1;
+}
+
+.mobile-nav-content {
+    position: absolute;
+    top: var(--header-height);
+    right: 0;
+    width: 100%;
+    height: calc(100vh - var(--header-height));
+    background: rgba(20, 20, 20, 0.9);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    display: flex;
+    flex-direction: column;
+    padding: 40px 20px;
+    transform: translateY(-20px);
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.mobile-nav-overlay.is-active .mobile-nav-content {
+    transform: translateY(0);
+}
+
+.mobile-nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin-bottom: auto;
+    /* Push socials to bottom */
+}
+
+.mobile-link {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text-primary);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Staggered animation for links */
+.mobile-nav-overlay.is-active .mobile-link:nth-child(1) {
+    transition-delay: 0.1s;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.mobile-nav-overlay.is-active .mobile-link:nth-child(2) {
+    transition-delay: 0.15s;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.mobile-nav-overlay.is-active .mobile-link:nth-child(3) {
+    transition-delay: 0.2s;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.mobile-nav-overlay.is-active .mobile-link:nth-child(4) {
+    transition-delay: 0.25s;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.mobile-socials {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    padding-top: 40px;
+    border-top: 1px solid var(--glass-border);
+    opacity: 0;
+    transition: opacity 0.5s ease 0.4s;
+}
+
+.mobile-nav-overlay.is-active .mobile-socials {
+    opacity: 1;
+}
+
+.mobile-socials img {
     width: 28px;
-    height: 28px;
-    margin-bottom: 4px;
-}
-
-.tab-label {
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.2px;
+    opacity: 0.8;
 }
 
 /* --- Footer --- */
 footer {
     padding: 40px 20px 20px;
-    /* Reduced for bottom tab bar */
     text-align: center;
     background-color: var(--bg-color);
 }
@@ -456,8 +582,13 @@ footer {
 /* --- Desktop / Large Screen Overrides --- */
 @media screen and (min-width: 900px) {
     body {
-        padding-bottom: 0;
-        /* No bottom tab bar */
+        /* body padding adjustment for desktop usually 0 anyway */
+    }
+
+    /* Hide Hamburger on Desktop */
+    .hamburger-btn,
+    .mobile-nav-overlay {
+        display: none !important;
     }
 
     /* Header Nav Visible */
@@ -510,9 +641,7 @@ footer {
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
     }
 
-    .bottom-tab-bar {
-        display: none;
-    }
+    /* .bottom-tab-bar rule removed */
 }
 
 /* --- Sub-Page Styles (Programming/Graphics) --- */

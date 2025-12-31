@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Article | Tetra</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="../style/style.css">
+
+    <!-- Note-like Article Styles -->
+    <style>
+        /* Override default readable font for article */
+        .article-container {
+            max-width: 740px;
+            /* Note standard width */
+            margin: 40px auto 80px;
+            padding: 60px 50px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+            color: #222;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .article-container {
+                padding: 30px 20px;
+                margin: 20px auto 100px;
+                border-radius: 0;
+                /* Full width on mobile often feels better, but let's keep radius slightly or 0 */
+                width: 95%;
+            }
+        }
+
+        .article-header {
+            margin-bottom: 50px;
+        }
+
+        .article-title {
+            font-family: "Zen Maru Gothic", -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+            font-size: 2.4rem;
+            /* Larger */
+            font-weight: 700;
+            line-height: 1.4;
+            color: #111;
+            margin-bottom: 24px;
+            letter-spacing: 0.05em;
+            font-feature-settings: "palt";
+        }
+
+        .article-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 0.9rem;
+            color: #777;
+            font-family: "Google Sans", sans-serif;
+        }
+
+        .article-label {
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #555;
+            background-color: #f2f2f2;
+            border: 1px solid transparent;
+        }
+
+        .article-label.notice {
+            background: rgba(255, 107, 107, 0.1);
+            color: #d63031;
+            border-color: rgba(255, 107, 107, 0.2);
+        }
+
+        .article-label.info {
+            background: rgba(79, 172, 254, 0.1);
+            color: #0984e3;
+            border-color: rgba(79, 172, 254, 0.2);
+        }
+
+        .article-label.event {
+            background: rgba(67, 233, 123, 0.1);
+            color: #00b894;
+            border-color: rgba(67, 233, 123, 0.2);
+        }
+
+        .article-date {
+            font-family: "Google Sans", sans-serif;
+        }
+
+        /* Body Content */
+        .article-body {
+            font-size: 1.1rem;
+            /* Slightly larger text like Note */
+            line-height: 1.9;
+            color: #333;
+        }
+
+        .article-body h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-top: 60px;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #eee;
+            color: #222;
+        }
+
+        .article-body h3 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            color: #222;
+        }
+
+        .article-body p {
+            margin-bottom: 2rem;
+            letter-spacing: 0.03em;
+        }
+
+        .article-body strong {
+            background: linear-gradient(transparent 70%, rgba(255, 230, 0, 0.3) 70%);
+            padding: 0 4px;
+            font-weight: 700;
+        }
+
+        .article-body ul,
+        .article-body ol {
+            margin-bottom: 2rem;
+            padding-left: 1.5rem;
+            background: #f9f9f9;
+            padding: 24px 24px 24px 40px;
+            border-radius: 8px;
+        }
+
+        .article-body li {
+            margin-bottom: 0.8rem;
+        }
+
+        .article-body blockquote {
+            border-left: 4px solid #ddd;
+            margin: 2rem 0;
+            padding-left: 1rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        .article-body img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            margin: 32px 0;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .article-body a {
+            color: #2cb696;
+            /* Note-ish green or keep brand color */
+            text-decoration: underline;
+            text-underline-offset: 4px;
+        }
+
+        .article-body a:hover {
+            color: #1a9c7d;
+        }
+
+        /* Back Link */
+        .back-link-wrapper {
+            max-width: 740px;
+            margin: 20px auto 0;
+            padding: 0 20px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: rgba(255, 255, 255, 0.8);
+            /* Assuming dark background outside */
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+
+        .back-link:hover {
+            opacity: 0.7;
+        }
+
+        .back-link svg {
+            margin-right: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="header-inner">
+            <a href="../index.html" class="logo-box">
+                <img src="../images/official_logo_sq_ske_white.png" alt="Tetra">
+            </a>
+
+            <!-- Mobile Hamburger Button -->
+            <button class="hamburger-btn" aria-label="Menu">
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </button>
+
+            <nav class="desktop-nav">
+                <a href="news.html" class="nav-link current">News</a>
+                <a href="../programming/programming.html" class="nav-link">Programming</a>
+                <a href="../graphics/graphics.html" class="nav-link">Graphics</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="back-link-wrapper">
+            <a href="news.html" class="back-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back to News
+            </a>
+        </div>
+
+        <article class="article-container">
+            <header class="article-header">
+                <h1 id="article-title" class="article-title">Loading...</h1>
+                <div class="article-meta">
+                    <span id="article-date" class="article-date"></span>
+                    <span id="article-label" class="article-label"></span>
+                </div>
+            </header>
+
+            <div id="article-body" class="article-body">
+                <!-- Markdown content will be injected here -->
+            </div>
+        </article>
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <!-- Mobile Navigation Overlay -->
+    <div class="mobile-nav-overlay">
+        <div class="mobile-nav-content">
+            <nav class="mobile-nav-links">
+                <a href="../index.html" class="mobile-link">Home</a>
+                <a href="news.html" class="mobile-link">News</a>
+                <a href="../programming/programming.html" class="mobile-link">Programming</a>
+                <a href="../graphics/graphics.html" class="mobile-link">Graphics</a>
+            </nav>
+            <div class="mobile-socials">
+                <a href="https://www.instagram.com/tetra.00000100/"><img src="../images/Instagram_Glyph_White.png"
+                        alt="Instagram"></a>
+                <a href="https://x.com/Tetra00000100"><img src="../images/x_logo-white.png" alt="X"></a>
+                <a href="https://www.youtube.com/@Tetra.0100"><img src="../images/youtube_social_square_dark.png"
+                        alt="YouTube" style="filter: invert(1);"></a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="social-links">
+            <a href="https://www.instagram.com/tetra.00000100/"><img src="../images/Instagram_Glyph_White.png"
+                    alt="Instagram"></a>
+            <a href="https://x.com/Tetra00000100"><img src="../images/x_logo-white.png" alt="X"></a>
+            <a href="https://www.youtube.com/@Tetra.0100"><img src="../images/youtube_social_square_dark.png"
+                    alt="YouTube" style="filter: invert(1);"></a>
+        </div>
+        <p class="copyright">&copy; 2024 Tetra Meiji Gakuin Univ.</p>
+    </footer>
+
+    <!-- Scripts -->
+    <!-- Load Markdown & Sanitizer libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+
+    <!-- Load Data -->
+    <script src="./news_data.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Get ID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const articleId = urlParams.get('id');
+
+            if (!articleId) {
+                document.getElementById('article-title').textContent = 'Article Not Found';
+                document.getElementById('article-body').textContent = 'No article ID specified.';
+                return;
+            }
+
+            // 2. Find article in newsItems (from news_data.js)
+            const article = newsItems.find(item => item.id === articleId);
+
+            if (!article) {
+                document.getElementById('article-title').textContent = 'Article Not Found';
+                document.getElementById('article-body').textContent = 'The requested article does not exist.';
+                return;
+            }
+
+            // 3. Render content
+            document.title = `${article.title} | Tetra News`;
+
+            document.getElementById('article-title').textContent = article.title;
+            document.getElementById('article-date').textContent = article.date;
+
+            const labelEl = document.getElementById('article-label');
+            labelEl.textContent = article.label;
+            labelEl.className = `article-label ${article.type}`;
+
+            // Convert Markdown to HTML and Sanitize
+            if (article.content) {
+                const rawHtml = marked.parse(article.content);
+                const safeHtml = DOMPurify.sanitize(rawHtml);
+                document.getElementById('article-body').innerHTML = safeHtml;
+            } else {
+                document.getElementById('article-body').textContent = 'No content available.';
+            }
+        });
+    </script>
+
+    <script src="../script/script.js"></script>
+</body>
+
+</html>
