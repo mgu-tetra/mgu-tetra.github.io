@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Greeting 2025 | Tetra</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="./style/style.css">
+</head>
+
+<body>
+
+    <header>
+        <div class="header-inner">
+            <a href="index.html" class="logo-box">
+                <img src="./images/official_logo_sq_ske_white.png" alt="Tetra">
+            </a>
+
+            <!-- Desktop Navigation -->
+            <nav class="desktop-nav">
+                <a href="./news/news.html" class="nav-link">News</a>
+                <a href="./programming/programming.html" class="nav-link">Programming</a>
+                <a href="./graphics/graphics.html" class="nav-link">Graphics</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Greeting / Hero Section -->
+        <section class="greeting-hero" style="position: relative; overflow: hidden;">
+            <div class="confetti-container" id="confetti-container"></div>
+            <h1 class="greeting-text">
+                新年、あけましておめでとうございます。<br>
+                2026年も、新しい景色を求めて。
+                <span>Tetra New Year's Greeting</span>
+            </h1>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    const container = document.getElementById('confetti-container');
+                    if (!container) return;
+
+                    const colors = ['#FFD700', '#FDB931', '#C5A059', '#FFF8DC', '#ffeb3b'];
+                    const particleCount = 60;
+
+                    for (let i = 0; i < particleCount; i++) {
+                        const confetti = document.createElement('div');
+                        confetti.classList.add('confetti');
+
+                        // Random properties
+                        const bg = colors[Math.floor(Math.random() * colors.length)];
+                        const left = Math.random() * 100 + '%';
+                        const animDuration = Math.random() * 3 + 4 + 's'; // 4-7s
+                        const animDelay = Math.random() * 5 + 's';
+                        const size = Math.random() * 6 + 4 + 'px';
+
+                        // Apply styles
+                        confetti.style.backgroundColor = bg;
+                        confetti.style.left = left;
+                        confetti.style.width = size;
+                        confetti.style.height = size;
+                        confetti.style.opacity = Math.random() * 0.5 + 0.5;
+
+                        // Set animation duration
+                        confetti.style.animationDuration = `${animDuration}, ${Math.random() * 2 + 2}s`;
+                        confetti.style.animationDelay = `${animDelay}, ${Math.random() * 1}s`;
+
+                        container.appendChild(confetti);
+                    }
+                });
+            </script>
+        </section>
+
+        <!-- Masonry Gallery Section -->
+        <div class="container">
+            <h2 class="section-title text-center" style="text-align: center; margin-bottom: 40px;">2025 Gallery</h2>
+            <div class="masonry-gallery reveal-on-scroll">
+                <div class="gallery-item">
+                    <img src="./images/image6.jpg" alt="Gallery Image 1">
+                </div>
+                <div class="gallery-item">
+                    <img src="./images/image7.jpg" alt="Gallery Image 2">
+                </div>
+                <div class="gallery-item">
+                    <img src="./images/image4.jpeg" alt="Gallery Image 3">
+                </div>
+                <div class="gallery-item">
+                    <img src="./images/image9.jpeg" alt="Gallery Image 4">
+                </div>
+                <div class="gallery-item">
+                    <img src="./images/image10.jpeg" alt="Gallery Image 5">
+                </div>
+                <!-- Reusing images to simulate more content for the masonry effect -->
+                <div class="gallery-item">
+                    <img src="./images/image6.jpg" alt="Gallery Image 6">
+                </div>
+            </div>
+        </div>
+
+        <!-- Future Activities Section -->
+        <section class="future-activities">
+            <h2 class="section-title text-center" style="text-align: center; margin-bottom: 60px;">2025 Vision</h2>
+
+            <div class="activity-block reveal-on-scroll">
+                <div class="activity-content">
+                    <h3 class="activity-title">技術と表現の融合</h3>
+                    <p class="activity-desc">
+                        2026年は、プログラミングとグラフィックスの境界線をより曖昧に。<br>
+                        新しいインタラクティブアートや、実用的なアプリケーション開発において、
+                        デザインとエンジニアリングの融合をさらに推し進めます。
+                    </p>
+                </div>
+                <div class="activity-image">
+                    <img src="./images/image7.jpg" alt="Vision Image 1">
+                </div>
+            </div>
+
+            <div class="activity-block reveal-on-scroll">
+                <div class="activity-content">
+                    <h3 class="activity-title">コミュニティの拡大</h3>
+                    <p class="activity-desc">
+                        学内での活動に加え、外部との連携も強化。<br>
+                        ハッカソンへの参加や、他大学との合同展示会など、
+                        Tetraの「四面体」のごとく多角的な繋がりを築いていきます。
+                    </p>
+                </div>
+                <div class="activity-image">
+                    <img src="./images/image6.jpg" alt="Vision Image 2">
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="bottom-tab-bar">
+        <a href="index.html" class="tab-item">
+            <div class="tab-icon">
+                <svg viewBox="0 0 24 24" fill="none" class="icon" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+            </div>
+            <span class="tab-label">Home</span>
+        </a>
+        <a href="./programming/programming.html" class="tab-item">
+            <div class="tab-icon">
+                <svg viewBox="0 0 24 24" fill="none" class="icon" stroke="currentColor" stroke-width="2">
+                    <polyline points="16 18 22 12 16 6"></polyline>
+                    <polyline points="8 6 2 12 8 18"></polyline>
+                </svg>
+            </div>
+            <span class="tab-label">Dev</span>
+        </a>
+        <a href="./graphics/graphics.html" class="tab-item">
+            <div class="tab-icon">
+                <svg viewBox="0 0 24 24" fill="none" class="icon" stroke="currentColor" stroke-width="2">
+                    <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
+                    <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
+                    <path d="M2 2l7.586 7.586"></path>
+                    <circle cx="11" cy="11" r="2"></circle>
+                </svg>
+            </div>
+            <span class="tab-label">Design</span>
+        </a>
+    </nav>
+
+    <footer>
+        <div class="social-links">
+            <a href="https://www.instagram.com/tetra.00000100/"><img src="./images/Instagram_Glyph_White.png"
+                    alt="Instagram"></a>
+            <a href="https://x.com/Tetra00000100"><img src="./images/x_logo-white.png" alt="X"></a>
+            <a href="https://www.youtube.com/@Tetra.0100"><img src="./images/youtube_social_square_dark.png"
+                    alt="YouTube" style="filter: invert(1);"></a>
+        </div>
+        <p class="copyright">&copy; 2025 Tetra Meiji Gakuin Univ.</p>
+    </footer>
+
+    <script src="./script/script.js"></script>
+</body>
+
+</html>
+
+<!-- nano -->

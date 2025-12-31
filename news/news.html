@@ -43,34 +43,50 @@
 
             <section class="news-archive-section">
                 <!-- News List -->
-                <ul class="news-archive-list">
-                    <li class="news-archive-item">
-                        <a href="../tetra_coming-soon/tetra_coming-soon.html" class="news-link">
-                            <span class="news-date">2024.10.07</span>
-                            <span class="news-label notice">Notice</span>
-                            <span class="news-title">Webサイトリニューアルのお知らせ</span>
-                            <span class="news-arrow">→</span>
-                        </a>
-                    </li>
-                    <li class="news-archive-item">
-                        <a href="../tetra_coming-soon/tetra_coming-soon.html" class="news-link">
-                            <span class="news-date">2024.09.27</span>
-                            <span class="news-label info">Info</span>
-                            <span class="news-title">サークル長からのご挨拶</span>
-                            <span class="news-arrow">→</span>
-                        </a>
-                    </li>
-                    <li class="news-archive-item">
-                        <a href="../tetra_coming-soon/tetra_coming-soon.html" class="news-link">
-                            <span class="news-date">2024.09.20</span>
-                            <span class="news-label event">Event</span>
-                            <span class="news-title">新サークル『Tetra』活動開始</span>
-                            <span class="news-arrow">→</span>
-                        </a>
-                    </li>
+                <ul class="news-archive-list" id="news-archive-list">
+                    <!-- Dynamic Content -->
                 </ul>
             </section>
         </div>
+    </main>
+
+    <script src="./news_data.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const list = document.getElementById('news-archive-list');
+            if (!list) return;
+
+            const sortedNews = newsItems.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            sortedNews.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'news-archive-item';
+
+                // Fix path: data.js has "./" (root-relative context), we are in news/ so we need "../"
+                // But wait, data.js has "./path/to/file", so "./greeting.html".
+                // We are in news/news.html. To go to greeting.html (in root), we need "../greeting.html".
+                // To go to tetra_coming-soon (in root/tetra...), we need "../tetra...".
+
+                // Simple logic: Prepend "." to make it "../" if it starts with "./"
+                let adjustedUrl = item.url;
+                if (adjustedUrl.startsWith('./')) {
+                    adjustedUrl = '.' + adjustedUrl;
+                }
+
+                li.innerHTML = `
+                    <a href="${adjustedUrl}" class="news-link">
+                        <span class="news-date">${item.date}</span>
+                        <span class="news-label ${item.type}">${item.label}</span>
+                        <span class="news-title">${item.title}</span>
+                        <span class="news-arrow">→</span>
+                    </a>
+                `;
+                list.appendChild(li);
+            });
+        });
+    </script>
+    </section>
+    </div>
     </main>
 
     <!-- Mobile Bottom Navigation -->

@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     /* --- 1. Scroll Reveal Animation --- */
-    const revealElements = document.querySelectorAll('.section-title, .dept-card, .ticker-container');
+    const revealElements = document.querySelectorAll('.reveal-on-scroll, .section-title, .dept-card, .ticker-container');
 
     // Add class for initial state
     revealElements.forEach(el => el.classList.add('reveal-on-scroll'));

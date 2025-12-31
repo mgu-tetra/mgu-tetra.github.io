@@ -41,28 +41,39 @@
             <div class="ticker-container">
                 <a href="./news/news.html" class="ticker-label">NEWS</a>
                 <div class="ticker-list-wrapper">
-                    <ul class="ticker-list">
-                        <li class="ticker-item">
-                            <a href="./tetra_coming-soon/tetra_coming-soon.html">
-                                <span class="ticker-date">2024.10.07</span>
-                                Webサイトリニューアルのお知らせ
-                            </a>
-                        </li>
-                        <li class="ticker-item">
-                            <a href="./tetra_coming-soon/tetra_coming-soon.html">
-                                <span class="ticker-date">2024.09.27</span>
-                                サークル長からのご挨拶
-                            </a>
-                        </li>
-                        <li class="ticker-item">
-                            <a href="./tetra_coming-soon/tetra_coming-soon.html">
-                                <span class="ticker-date">2024.09.20</span>
-                                新サークル『Tetra』活動開始
-                            </a>
-                        </li>
+                    <ul class="ticker-list" id="ticker-list">
+                        <!-- Dynamic Content Loaded via JS -->
                     </ul>
                 </div>
             </div>
+        </div>
+
+        <script src="./news/news_data.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const tickerList = document.getElementById('ticker-list');
+                if (!tickerList) return;
+
+                // Sort by date desc just in case
+                const sortedNews = newsItems.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                sortedNews.forEach(item => {
+                    const li = document.createElement('li');
+                    li.className = 'ticker-item';
+
+                    // index.html is at root, so url in data.js (./...) is correct
+                    li.innerHTML = `
+                        <a href="${item.url}">
+                            <span class="ticker-date">${item.date}</span>
+                            ${item.title}
+                        </a>
+                    `;
+                    tickerList.appendChild(li);
+                });
+            });
+        </script>
+        </div>
+        </div>
         </div>
 
         <div class="container">
