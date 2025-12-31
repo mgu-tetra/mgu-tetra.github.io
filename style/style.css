@@ -144,6 +144,70 @@ header {
     }
 }
 
+/* --- Greeting New Year 2026 Special Styles --- */
+.greeting-text {
+    font-family: "Zen Maru Gothic", sans-serif;
+    font-weight: 700;
+    font-size: 40px;
+    line-height: 1.5;
+    text-align: center;
+    color: transparent;
+    /* Make text transparent so background shows through */
+
+    /* 
+       Layered Backgrounds:
+       1. The Gold Gradient (Tracked by JS variables)
+       2. The fallback White color
+    */
+    background-image:
+        radial-gradient(circle 120px at var(--cursor-x, 50%) var(--cursor-y, 50%),
+            #FFD700 0%,
+            #FDB931 30%,
+            transparent 70%),
+        linear-gradient(#fff, #fff);
+    /* Base White Text */
+
+    background-size: 100% 100%, 100% 100%;
+    background-position: 0 0, 0 0;
+    background-repeat: no-repeat;
+
+    /* Standard standard */
+    background-clip: text;
+    -webkit-background-clip: text;
+    /* Safari/Chrome requirement */
+    -webkit-text-fill-color: transparent;
+    /* CRITICAL for Safari/Webkit to actually show the background */
+
+    position: relative;
+    z-index: 50;
+    /* Ensure it is above confetti or other layers */
+    margin-bottom: 40px;
+    padding: 0 20px;
+    display: inline-block;
+    /* Ensure bounds are tight to text if possible, but H1 is block usually. Inline-block might help with wrapping. */
+    width: 100%;
+    /* Keep full width layout */
+}
+
+.greeting-text span {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 400;
+    margin-top: 10px;
+    letter-spacing: 0.1em;
+    opacity: 0.8;
+    color: var(--text-primary);
+    /* Keep subtitle normal white */
+    /* If you want the subtitle to ALSO have the effect, remove this color override. 
+       But usually subtitle is smaller, maybe keep it simple. 
+       The user asked for "headings text", let's assume the main japanese text.
+       However, technically the span is inside the h1. 
+       If I set color: white on span, it covers the background-clip. 
+    */
+}
+
+
 /* --- News Ticker (Fast Retailing Style Marquee) --- */
 .news-ticker {
     margin: 0 0 40px 0;

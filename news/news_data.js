@@ -68,10 +68,7 @@ Tetraの公式Webサイトが新しくなりました！
 
 ### Tetraとは？
 Tetraは、4つの要素（Technology, Engineering, Typography, Art）を組み合わせた造語です。
-技術と芸術の融合を目指して活動してまいります。
-
-詳しくは[Aboutページ](../index.html)をご覧ください。
-        `,
+技術と芸術の融合を目指して活動してまいります。`,
         url: './news/article.html?id=tetra-launch'
     }
 ];
