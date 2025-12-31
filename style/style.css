@@ -357,7 +357,7 @@ header {
     /* Slight zoom on hover/focus */
 }
 
-/* Unused class removed/ignored, styling applied directly to elements */
+
 .dept-content {
     padding: 24px;
 }
@@ -581,9 +581,7 @@ footer {
 
 /* --- Desktop / Large Screen Overrides --- */
 @media screen and (min-width: 900px) {
-    body {
-        /* body padding adjustment for desktop usually 0 anyway */
-    }
+
 
     /* Hide Hamburger on Desktop */
     .hamburger-btn,
@@ -641,7 +639,7 @@ footer {
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
     }
 
-    /* .bottom-tab-bar rule removed */
+
 }
 
 /* --- Sub-Page Styles (Programming/Graphics) --- */
