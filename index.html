@@ -56,8 +56,15 @@
 
                 // Sort by date desc just in case
                 const sortedNews = newsItems.sort((a, b) => new Date(b.date) - new Date(a.date));
+                const now = new Date();
 
                 sortedNews.forEach(item => {
+                    // Check publication time
+                    if (item.publishAt) {
+                        const publishDate = new Date(item.publishAt);
+                        if (now < publishDate) return; // Skip future items
+                    }
+
                     const li = document.createElement('li');
                     li.className = 'ticker-item';
 
