@@ -5,8 +5,8 @@ const newsItems = [
         label: 'Greeting',
         type: 'event',
         title: '2026年 新年のご挨拶',
-        publishAt: '2025-12-31T00:00:00+09:00',
-        // publishAt: '2026-01-01T00:00:00+09:00',
+        // publishAt: '2025-12-31T00:00:00+09:00',
+        publishAt: '2026-01-01T00:00:00+09:00',
         url: './greeting_newyear_2026.html'
     },
     {
