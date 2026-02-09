@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Editor | Tetra Admin</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Markdown Parser -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --surface: #141414;
+            --surface-hover: #1a1a1a;
+            --surface-raised: #1e1e1e;
+            --border: #2a2a2a;
+            --border-focus: #0A84FF;
+            --text: #f5f5f5;
+            --text-secondary: #999;
+            --accent: #0A84FF;
+            --accent-hover: #409CFF;
+            --danger: #FF453A;
+            --danger-hover: #FF6961;
+            --success: #30D158;
+            --warning: #FF9F0A;
+            --radius: 12px;
+            --radius-sm: 8px;
+            --font: -apple-system, BlinkMacSystemFont, "Google Sans", "Helvetica Neue", sans-serif;
+            --font-mono: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Layout */
+        .app {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            grid-template-rows: auto 1fr;
+            height: 100vh;
+        }
+
+        @media (max-width: 900px) {
+            .app {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                display: none;
+            }
+            .sidebar.mobile-open {
+                display: block;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 1000;
+            }
+        }
+
+        /* Top Bar */
+        .topbar {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 24px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            gap: 16px;
+        }
+
+        .topbar-title {
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .topbar-title .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+        }
+
+        .topbar-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .mobile-sidebar-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+
+        @media (max-width: 900px) {
+            .mobile-sidebar-toggle {
+                display: block;
+            }
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: var(--surface-raised);
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            background: var(--surface-hover);
+            border-color: #444;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            border-color: var(--accent-hover);
+        }
+
+        .btn-danger {
+            background: transparent;
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background: var(--danger);
+            color: #fff;
+        }
+
+        .btn-success {
+            background: var(--success);
+            border-color: var(--success);
+            color: #000;
+        }
+
+        .btn-success:hover {
+            opacity: 0.9;
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sidebar-header h3 {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .article-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+
+        .article-list-item {
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: background 0.15s;
+            margin-bottom: 2px;
+        }
+
+        .article-list-item:hover {
+            background: var(--surface-hover);
+        }
+
+        .article-list-item.active {
+            background: rgba(10, 132, 255, 0.15);
+            border: 1px solid rgba(10, 132, 255, 0.3);
+        }
+
+        .article-list-item .item-date {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+            font-family: var(--font-mono);
+        }
+
+        .article-list-item .item-title {
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1.3;
+            margin-bottom: 4px;
+        }
+
+        .article-list-item .item-label {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+
+        .item-label.notice { background: rgba(255, 149, 0, 0.2); color: #FF9500; }
+        .item-label.info { background: rgba(10, 132, 255, 0.2); color: #0A84FF; }
+        .item-label.event { background: rgba(48, 209, 88, 0.2); color: #30D158; }
+
+        /* Main Editor */
+        .editor-area {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .editor-empty {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 15px;
+        }
+
+        .editor-form {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 14px;
+            font-family: var(--font);
+            transition: border-color 0.15s;
+            outline: none;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--border-focus);
+        }
+
+        .form-group select {
+            cursor: pointer;
+        }
+
+        /* Markdown Editor */
+        .markdown-section {
+            margin-bottom: 24px;
+        }
+
+        .markdown-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 0;
+        }
+
+        .markdown-tab {
+            padding: 8px 20px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .markdown-tab:first-child {
+            border-radius: var(--radius-sm) 0 0 0;
+        }
+
+        .markdown-tab:last-child {
+            border-radius: 0 var(--radius-sm) 0 0;
+        }
+
+        .markdown-tab.active {
+            background: var(--bg);
+            color: var(--text);
+            border-bottom-color: var(--bg);
+        }
+
+        .markdown-editor {
+            width: 100%;
+            min-height: 300px;
+            padding: 16px;
+            border: 1px solid var(--border);
+            border-top: none;
+            border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-mono);
+            font-size: 14px;
+            line-height: 1.7;
+            resize: vertical;
+            outline: none;
+            tab-size: 2;
+        }
+
+        .markdown-editor:focus {
+            border-color: var(--border-focus);
+        }
+
+        .markdown-preview {
+            min-height: 300px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            border-top: none;
+            border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+            background: #fff;
+            color: #222;
+            font-size: 15px;
+            line-height: 1.8;
+            display: none;
+        }
+
+        .markdown-preview h2 {
+            font-size: 1.5em;
+            margin: 1.5em 0 0.5em;
+            padding-bottom: 0.3em;
+            border-bottom: 1px solid #eee;
+        }
+
+        .markdown-preview h3 {
+            font-size: 1.25em;
+            margin: 1.2em 0 0.5em;
+        }
+
+        .markdown-preview p {
+            margin-bottom: 1em;
+        }
+
+        .markdown-preview ul,
+        .markdown-preview ol {
+            margin-bottom: 1em;
+            padding-left: 2em;
+        }
+
+        .markdown-preview li {
+            margin-bottom: 0.3em;
+        }
+
+        .markdown-preview strong {
+            font-weight: 700;
+        }
+
+        .markdown-preview blockquote {
+            border-left: 4px solid #ddd;
+            margin: 1em 0;
+            padding-left: 1em;
+            color: #666;
+        }
+
+        /* URL Options */
+        .url-options {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .url-option {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .url-option input[type="radio"] {
+            accent-color: var(--accent);
+        }
+
+        /* Export Modal */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-backdrop.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            max-width: 800px;
+            width: 90%;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-header h2 {
+            font-size: 18px;
+        }
+
+        .modal-body {
+            padding: 24px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .modal-body pre {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            overflow-x: auto;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            line-height: 1.6;
+            white-space: pre;
+            color: var(--text);
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 12px 20px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 3000;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .toast.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast.success {
+            background: var(--success);
+            color: #000;
+        }
+
+        .toast.error {
+            background: var(--danger);
+            color: #fff;
+        }
+
+        /* Delete Confirm */
+        .confirm-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: rgba(255, 69, 58, 0.1);
+            border: 1px solid rgba(255, 69, 58, 0.3);
+            border-radius: var(--radius-sm);
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        .confirm-bar .confirm-text {
+            flex: 1;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <!-- Top Bar -->
+        <div class="topbar">
+            <div class="topbar-title">
+                <button class="mobile-sidebar-toggle" onclick="toggleMobileSidebar()">&#9776;</button>
+                <span class="dot"></span>
+                Tetra News Editor
+            </div>
+            <div class="topbar-actions">
+                <button class="btn" onclick="exportNewsData()">Export news_data.js</button>
+                <button class="btn" onclick="downloadNewsData()">Download</button>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h3>Articles</h3>
+                <button class="btn btn-primary btn-sm" onclick="createNewArticle()">+ New</button>
+            </div>
+            <div class="article-list" id="article-list">
+                <!-- Dynamic -->
+            </div>
+        </div>
+
+        <!-- Editor Area -->
+        <div class="editor-area" id="editor-area">
+            <div class="editor-empty" id="editor-empty">
+                <div style="text-align: center;">
+                    <p style="font-size: 32px; margin-bottom: 8px;">&#9997;</p>
+                    <p>Select an article or create a new one</p>
+                </div>
+            </div>
+
+            <div class="editor-form" id="editor-form" style="display: none;">
+                <!-- Delete Confirm -->
+                <div class="confirm-bar" id="delete-confirm" style="display: none;">
+                    <span class="confirm-text">Delete this article?</span>
+                    <button class="btn btn-danger btn-sm" onclick="confirmDelete()">Delete</button>
+                    <button class="btn btn-sm" onclick="cancelDelete()">Cancel</button>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="field-id">ID (slug)</label>
+                        <input type="text" id="field-id" placeholder="e.g. my-new-article">
+                    </div>
+                    <div class="form-group">
+                        <label for="field-date">Date</label>
+                        <input type="text" id="field-date" placeholder="2026.01.01">
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="field-title">Title</label>
+                        <input type="text" id="field-title" placeholder="Article title">
+                    </div>
+                    <div class="form-group">
+                        <label for="field-type">Type</label>
+                        <select id="field-type">
+                            <option value="notice">Notice</option>
+                            <option value="info">Info</option>
+                            <option value="event">Event</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="field-label">Label</label>
+                        <input type="text" id="field-label" placeholder="e.g. Notice, Info, Event">
+                    </div>
+                    <div class="form-group">
+                        <label for="field-publishat">Publish At (ISO 8601)</label>
+                        <input type="datetime-local" id="field-publishat">
+                    </div>
+                    <div class="form-group">
+                        <label>URL Type</label>
+                        <div class="url-options">
+                            <label class="url-option">
+                                <input type="radio" name="url-type" value="auto" checked onchange="updateUrlType()">
+                                Auto (article.html)
+                            </label>
+                            <label class="url-option">
+                                <input type="radio" name="url-type" value="custom" onchange="updateUrlType()">
+                                Custom URL
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group full-width" id="custom-url-group" style="display: none;">
+                        <label for="field-url">Custom URL</label>
+                        <input type="text" id="field-url" placeholder="e.g. ./greeting_newyear_2026.html">
+                    </div>
+                </div>
+
+                <!-- Markdown Content -->
+                <div class="markdown-section">
+                    <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.03em; display: block; margin-bottom: 8px;">Content (Markdown)</label>
+                    <div class="markdown-tabs">
+                        <button class="markdown-tab active" onclick="switchTab('write')">Write</button>
+                        <button class="markdown-tab" onclick="switchTab('preview')">Preview</button>
+                    </div>
+                    <textarea class="markdown-editor" id="field-content" placeholder="Write your article content in Markdown..."></textarea>
+                    <div class="markdown-preview" id="markdown-preview"></div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div style="display: flex; gap: 8px; justify-content: space-between; align-items: center;">
+                    <button class="btn btn-danger" onclick="showDeleteConfirm()">Delete Article</button>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn" onclick="cancelEdit()">Cancel</button>
+                        <button class="btn btn-primary" onclick="saveArticle()">Save Article</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div class="modal-backdrop" id="export-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Export news_data.js</h2>
+                <button class="btn btn-sm" onclick="closeExportModal()">Close</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 12px; color: var(--text-secondary); font-size: 14px;">
+                    Copy the content below and replace <code>news/news_data.js</code> in your repository.
+                </p>
+                <pre id="export-content"></pre>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeExportModal()">Close</button>
+                <button class="btn btn-primary" onclick="copyExport()">Copy to Clipboard</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Load existing data -->
+    <script src="../news/news_data.js"></script>
+
+    <script>
+        // ── State ──
+        let articles = [];
+        let currentArticleId = null;
+
+        // Initialize from news_data.js
+        function init() {
+            if (typeof newsItems !== 'undefined') {
+                articles = JSON.parse(JSON.stringify(newsItems));
+            }
+            renderArticleList();
+        }
+
+        // ── Sidebar List ──
+        function renderArticleList() {
+            const list = document.getElementById('article-list');
+            const sorted = [...articles].sort((a, b) => {
+                const da = a.date ? a.date.replace(/\./g, '') : '0';
+                const db = b.date ? b.date.replace(/\./g, '') : '0';
+                return db.localeCompare(da);
+            });
+
+            list.innerHTML = sorted.map(item => `
+                <div class="article-list-item ${item.id === currentArticleId ? 'active' : ''}"
+                     onclick="selectArticle('${item.id}')">
+                    <div class="item-date">${item.date || ''}</div>
+                    <div class="item-title">${escapeHtml(item.title || 'Untitled')}</div>
+                    <span class="item-label ${item.type || ''}">${escapeHtml(item.label || item.type || '')}</span>
+                </div>
+            `).join('');
+        }
+
+        // ── Article Selection ──
+        function selectArticle(id) {
+            currentArticleId = id;
+            const article = articles.find(a => a.id === id);
+            if (!article) return;
+
+            document.getElementById('editor-empty').style.display = 'none';
+            document.getElementById('editor-form').style.display = 'block';
+            document.getElementById('delete-confirm').style.display = 'none';
+
+            document.getElementById('field-id').value = article.id || '';
+            document.getElementById('field-date').value = article.date || '';
+            document.getElementById('field-title').value = article.title || '';
+            document.getElementById('field-type').value = article.type || 'info';
+            document.getElementById('field-label').value = article.label || '';
+            document.getElementById('field-content').value = (article.content || '').trim();
+
+            // Publish At
+            if (article.publishAt) {
+                const d = new Date(article.publishAt);
+                const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+                document.getElementById('field-publishat').value = local;
+            } else {
+                document.getElementById('field-publishat').value = '';
+            }
+
+            // URL type
+            const isAutoUrl = !article.url || article.url.includes('article.html?id=');
+            const radioAuto = document.querySelector('input[name="url-type"][value="auto"]');
+            const radioCustom = document.querySelector('input[name="url-type"][value="custom"]');
+            if (isAutoUrl) {
+                radioAuto.checked = true;
+                document.getElementById('custom-url-group').style.display = 'none';
+            } else {
+                radioCustom.checked = true;
+                document.getElementById('custom-url-group').style.display = '';
+                document.getElementById('field-url').value = article.url || '';
+            }
+
+            // Reset tab to write
+            switchTab('write');
+            renderArticleList();
+
+            // Close mobile sidebar
+            document.getElementById('sidebar').classList.remove('mobile-open');
+        }
+
+        // ── Create New ──
+        function createNewArticle() {
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`;
+            const id = 'new-article-' + Date.now();
+
+            const newArticle = {
+                id: id,
+                date: dateStr,
+                label: 'Info',
+                type: 'info',
+                title: '',
+                publishAt: now.toISOString(),
+                content: '',
+                url: `./news/article.html?id=${id}`
+            };
+
+            articles.unshift(newArticle);
+            selectArticle(id);
+            renderArticleList();
+
+            // Focus title
+            setTimeout(() => document.getElementById('field-title').focus(), 100);
+        }
+
+        // ── Save Article ──
+        function saveArticle() {
+            const idx = articles.findIndex(a => a.id === currentArticleId);
+            if (idx === -1) return;
+
+            const newId = document.getElementById('field-id').value.trim();
+            if (!newId) {
+                showToast('ID is required', 'error');
+                return;
+            }
+
+            // Check duplicate ID
+            const duplicateIdx = articles.findIndex(a => a.id === newId);
+            if (duplicateIdx !== -1 && duplicateIdx !== idx) {
+                showToast('Duplicate ID exists', 'error');
+                return;
+            }
+
+            const urlType = document.querySelector('input[name="url-type"]:checked').value;
+            let url;
+            if (urlType === 'custom') {
+                url = document.getElementById('field-url').value.trim();
+            } else {
+                url = `./news/article.html?id=${newId}`;
+            }
+
+            const publishAtInput = document.getElementById('field-publishat').value;
+            let publishAt = '';
+            if (publishAtInput) {
+                publishAt = new Date(publishAtInput).toISOString().replace('.000Z', '+09:00');
+            }
+
+            articles[idx] = {
+                id: newId,
+                date: document.getElementById('field-date').value.trim(),
+                label: document.getElementById('field-label').value.trim(),
+                type: document.getElementById('field-type').value,
+                title: document.getElementById('field-title').value.trim(),
+                publishAt: publishAt,
+                content: document.getElementById('field-content').value,
+                url: url
+            };
+
+            currentArticleId = newId;
+            renderArticleList();
+            showToast('Article saved', 'success');
+        }
+
+        // ── Delete ──
+        function showDeleteConfirm() {
+            document.getElementById('delete-confirm').style.display = 'flex';
+        }
+
+        function cancelDelete() {
+            document.getElementById('delete-confirm').style.display = 'none';
+        }
+
+        function confirmDelete() {
+            articles = articles.filter(a => a.id !== currentArticleId);
+            currentArticleId = null;
+            document.getElementById('editor-form').style.display = 'none';
+            document.getElementById('editor-empty').style.display = 'flex';
+            renderArticleList();
+            showToast('Article deleted', 'success');
+        }
+
+        function cancelEdit() {
+            currentArticleId = null;
+            document.getElementById('editor-form').style.display = 'none';
+            document.getElementById('editor-empty').style.display = 'flex';
+            renderArticleList();
+        }
+
+        // ── Markdown Tabs ──
+        function switchTab(tab) {
+            const tabs = document.querySelectorAll('.markdown-tab');
+            const editor = document.querySelector('.markdown-editor');
+            const preview = document.getElementById('markdown-preview');
+
+            tabs.forEach(t => t.classList.remove('active'));
+
+            if (tab === 'write') {
+                tabs[0].classList.add('active');
+                editor.style.display = 'block';
+                preview.style.display = 'none';
+            } else {
+                tabs[1].classList.add('active');
+                editor.style.display = 'none';
+                preview.style.display = 'block';
+                const raw = marked.parse(document.getElementById('field-content').value);
+                preview.innerHTML = DOMPurify.sanitize(raw);
+            }
+        }
+
+        // ── URL Type Toggle ──
+        function updateUrlType() {
+            const val = document.querySelector('input[name="url-type"]:checked').value;
+            document.getElementById('custom-url-group').style.display = val === 'custom' ? '' : 'none';
+        }
+
+        // ── Export ──
+        function generateNewsDataJS() {
+            const items = articles.map(item => {
+                const contentStr = item.content ? item.content.replace(/`/g, '\\`').replace(/\$\{/g, '\\${') : '';
+                const lines = [
+                    `    {`,
+                    `        id: '${escapeSingleQuote(item.id)}',`,
+                    `        date: '${escapeSingleQuote(item.date)}',`,
+                    `        label: '${escapeSingleQuote(item.label)}',`,
+                    `        type: '${escapeSingleQuote(item.type)}',`,
+                    `        title: ${JSON.stringify(item.title)},`,
+                    `        publishAt: '${escapeSingleQuote(item.publishAt)}',`,
+                    `        content: \`\n${contentStr}\n        \`,`,
+                    `        url: '${escapeSingleQuote(item.url)}'`,
+                    `    }`
+                ];
+                return lines.join('\n');
+            });
+
+            return `const newsItems = [\n${items.join(',\n')}\n];\n`;
+        }
+
+        function exportNewsData() {
+            const content = generateNewsDataJS();
+            document.getElementById('export-content').textContent = content;
+            document.getElementById('export-modal').classList.add('active');
+        }
+
+        function closeExportModal() {
+            document.getElementById('export-modal').classList.remove('active');
+        }
+
+        function copyExport() {
+            const content = generateNewsDataJS();
+            navigator.clipboard.writeText(content).then(() => {
+                showToast('Copied to clipboard', 'success');
+            }).catch(() => {
+                showToast('Failed to copy', 'error');
+            });
+        }
+
+        function downloadNewsData() {
+            const content = generateNewsDataJS();
+            const blob = new Blob([content], { type: 'application/javascript' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'news_data.js';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Download started', 'success');
+        }
+
+        // ── Mobile Sidebar ──
+        function toggleMobileSidebar() {
+            document.getElementById('sidebar').classList.toggle('mobile-open');
+        }
+
+        // ── Utilities ──
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function escapeSingleQuote(str) {
+            if (!str) return '';
+            return String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        }
+
+        function showToast(msg, type) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = `toast ${type} visible`;
+            setTimeout(() => {
+                toast.classList.remove('visible');
+            }, 2500);
+        }
+
+        // ── Init ──
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+
+</html>
