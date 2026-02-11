@@ -88,6 +88,13 @@
             background: var(--surface);
             border-bottom: 1px solid var(--border);
             gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .topbar-title {
@@ -98,16 +105,10 @@
             gap: 10px;
         }
 
-        .topbar-title .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--success);
-        }
-
         .topbar-actions {
             display: flex;
             gap: 8px;
+            align-items: center;
         }
 
         .mobile-sidebar-toggle {
@@ -124,6 +125,36 @@
             .mobile-sidebar-toggle {
                 display: block;
             }
+        }
+
+        /* Auth Status */
+        .auth-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+        }
+
+        .auth-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .auth-dot.connected {
+            background: var(--success);
+        }
+
+        .auth-dot.disconnected {
+            background: #666;
+        }
+
+        .auth-user {
+            color: var(--text-secondary);
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         /* Buttons */
@@ -145,13 +176,18 @@
             border-color: #444;
         }
 
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         .btn-primary {
             background: var(--accent);
             border-color: var(--accent);
             color: #fff;
         }
 
-        .btn-primary:hover {
+        .btn-primary:hover:not(:disabled) {
             background: var(--accent-hover);
             border-color: var(--accent-hover);
         }
@@ -173,13 +209,67 @@
             color: #000;
         }
 
-        .btn-success:hover {
+        .btn-success:hover:not(:disabled) {
             opacity: 0.9;
         }
 
         .btn-sm {
             padding: 5px 10px;
             font-size: 12px;
+        }
+
+        /* Dropdown */
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 4px;
+            background: var(--surface-raised);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            min-width: 180px;
+            z-index: 500;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .dropdown-menu.open {
+            display: block;
+        }
+
+        .dropdown-item {
+            display: block;
+            width: 100%;
+            padding: 10px 16px;
+            border: none;
+            background: none;
+            color: var(--text);
+            font-size: 13px;
+            text-align: left;
+            cursor: pointer;
+            transition: background 0.1s;
+        }
+
+        .dropdown-item:hover {
+            background: var(--surface-hover);
+        }
+
+        .dropdown-item:first-child {
+            border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+        }
+
+        .dropdown-item:last-child {
+            border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+        }
+
+        .dropdown-separator {
+            height: 1px;
+            background: var(--border);
+            margin: 4px 0;
         }
 
         /* Sidebar */
@@ -416,30 +506,11 @@
             margin: 1.2em 0 0.5em;
         }
 
-        .markdown-preview p {
-            margin-bottom: 1em;
-        }
-
-        .markdown-preview ul,
-        .markdown-preview ol {
-            margin-bottom: 1em;
-            padding-left: 2em;
-        }
-
-        .markdown-preview li {
-            margin-bottom: 0.3em;
-        }
-
-        .markdown-preview strong {
-            font-weight: 700;
-        }
-
-        .markdown-preview blockquote {
-            border-left: 4px solid #ddd;
-            margin: 1em 0;
-            padding-left: 1em;
-            color: #666;
-        }
+        .markdown-preview p { margin-bottom: 1em; }
+        .markdown-preview ul, .markdown-preview ol { margin-bottom: 1em; padding-left: 2em; }
+        .markdown-preview li { margin-bottom: 0.3em; }
+        .markdown-preview strong { font-weight: 700; }
+        .markdown-preview blockquote { border-left: 4px solid #ddd; margin: 1em 0; padding-left: 1em; color: #666; }
 
         /* URL Options */
         .url-options {
@@ -461,7 +532,7 @@
             accent-color: var(--accent);
         }
 
-        /* Export Modal */
+        /* Modal */
         .modal-backdrop {
             position: fixed;
             top: 0;
@@ -530,6 +601,46 @@
             justify-content: flex-end;
         }
 
+        /* Auth Modal specific */
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .auth-form input {
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 14px;
+            font-family: var(--font-mono);
+            outline: none;
+        }
+
+        .auth-form input:focus {
+            border-color: var(--border-focus);
+        }
+
+        .auth-help {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .auth-help code {
+            background: var(--bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .auth-help a {
+            color: var(--accent);
+            text-decoration: underline;
+        }
+
         /* Toast */
         .toast {
             position: fixed;
@@ -551,14 +662,34 @@
             transform: translateY(0);
         }
 
-        .toast.success {
-            background: var(--success);
-            color: #000;
+        .toast.success { background: var(--success); color: #000; }
+        .toast.error { background: var(--danger); color: #fff; }
+
+        /* Publish status bar */
+        .publish-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: rgba(10, 132, 255, 0.1);
+            border: 1px solid rgba(10, 132, 255, 0.2);
+            border-radius: var(--radius-sm);
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: var(--accent);
         }
 
-        .toast.error {
-            background: var(--danger);
-            color: #fff;
+        .publish-status .spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(10, 132, 255, 0.3);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         /* Delete Confirm */
@@ -574,27 +705,13 @@
             font-size: 14px;
         }
 
-        .confirm-bar .confirm-text {
-            flex: 1;
-        }
+        .confirm-bar .confirm-text { flex: 1; }
 
         /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #333;
-            border-radius: 3px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
     </style>
 </head>
 
@@ -602,14 +719,26 @@
     <div class="app">
         <!-- Top Bar -->
         <div class="topbar">
-            <div class="topbar-title">
+            <div class="topbar-left">
                 <button class="mobile-sidebar-toggle" onclick="toggleMobileSidebar()">&#9776;</button>
-                <span class="dot"></span>
-                Tetra News Editor
+                <div class="topbar-title">Tetra News Editor</div>
+                <div class="auth-status" id="auth-status">
+                    <span class="auth-dot disconnected" id="auth-dot"></span>
+                    <span class="auth-user" id="auth-user">Not connected</span>
+                </div>
             </div>
             <div class="topbar-actions">
-                <button class="btn" onclick="exportNewsData()">Export news_data.js</button>
-                <button class="btn" onclick="downloadNewsData()">Download</button>
+                <button class="btn" id="auth-btn" onclick="openAuthModal()">Connect GitHub</button>
+                <button class="btn btn-success" id="publish-btn" onclick="publishToGitHub()" disabled>Publish</button>
+                <div class="dropdown">
+                    <button class="btn" onclick="toggleDropdown()">...</button>
+                    <div class="dropdown-menu" id="more-menu">
+                        <button class="dropdown-item" onclick="exportNewsData(); closeDropdown();">Export (view code)</button>
+                        <button class="dropdown-item" onclick="downloadNewsData(); closeDropdown();">Download file</button>
+                        <div class="dropdown-separator"></div>
+                        <button class="dropdown-item" onclick="reloadFromRemote(); closeDropdown();">Reload from GitHub</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -634,6 +763,12 @@
             </div>
 
             <div class="editor-form" id="editor-form" style="display: none;">
+                <!-- Publish Status -->
+                <div class="publish-status" id="publish-status" style="display: none;">
+                    <div class="spinner"></div>
+                    <span id="publish-status-text">Publishing...</span>
+                </div>
+
                 <!-- Delete Confirm -->
                 <div class="confirm-bar" id="delete-confirm" style="display: none;">
                     <span class="confirm-text">Delete this article?</span>
@@ -701,13 +836,38 @@
                 </div>
 
                 <!-- Action Buttons -->
-                <div style="display: flex; gap: 8px; justify-content: space-between; align-items: center;">
+                <div style="display: flex; gap: 8px; justify-content: space-between; align-items: center; flex-wrap: wrap;">
                     <button class="btn btn-danger" onclick="showDeleteConfirm()">Delete Article</button>
                     <div style="display: flex; gap: 8px;">
                         <button class="btn" onclick="cancelEdit()">Cancel</button>
                         <button class="btn btn-primary" onclick="saveArticle()">Save Article</button>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div class="modal-backdrop" id="auth-modal">
+        <div class="modal" style="max-width: 520px;">
+            <div class="modal-header">
+                <h2>Connect to GitHub</h2>
+                <button class="btn btn-sm" onclick="closeAuthModal()">Close</button>
+            </div>
+            <div class="modal-body">
+                <div class="auth-form">
+                    <div class="auth-help">
+                        <p>Personal Access Token (Fine-grained) that has <strong>Contents: Read and write</strong> permission for <code>mgu-tetra/mgu-tetra.github.io</code>.</p>
+                        <br>
+                        <p>Token is stored only in this browser's localStorage.</p>
+                    </div>
+                    <input type="password" id="pat-input" placeholder="github_pat_xxxx...">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeAuthModal()">Cancel</button>
+                <button class="btn btn-danger" id="disconnect-btn" onclick="disconnectGitHub()" style="display: none;">Disconnect</button>
+                <button class="btn btn-primary" onclick="connectGitHub()">Connect</button>
             </div>
         </div>
     </div>
@@ -739,19 +899,286 @@
     <script src="../news/news_data.js"></script>
 
     <script>
-        // ── State ──
+        // ══════════════════════════════════════
+        // Config
+        // ══════════════════════════════════════
+        const GITHUB_OWNER = 'mgu-tetra';
+        const GITHUB_REPO = 'mgu-tetra.github.io';
+        const FILE_PATH = 'news/news_data.js';
+        const BRANCH = 'main';
+        const STORAGE_KEY_PAT = 'tetra_github_pat';
+        const STORAGE_KEY_USER = 'tetra_github_user';
+
+        // ══════════════════════════════════════
+        // State
+        // ══════════════════════════════════════
         let articles = [];
         let currentArticleId = null;
+        let fileSha = null; // Required by GitHub API to update a file
+        let isPublishing = false;
 
-        // Initialize from news_data.js
+        // ══════════════════════════════════════
+        // Init
+        // ══════════════════════════════════════
         function init() {
             if (typeof newsItems !== 'undefined') {
                 articles = JSON.parse(JSON.stringify(newsItems));
             }
             renderArticleList();
+            restoreAuth();
         }
 
-        // ── Sidebar List ──
+        // ══════════════════════════════════════
+        // GitHub Authentication
+        // ══════════════════════════════════════
+        function getToken() {
+            return localStorage.getItem(STORAGE_KEY_PAT);
+        }
+
+        function isAuthenticated() {
+            return !!getToken();
+        }
+
+        function restoreAuth() {
+            const token = getToken();
+            const user = localStorage.getItem(STORAGE_KEY_USER);
+            if (token && user) {
+                setAuthUI(true, user);
+            } else if (token) {
+                // Validate token
+                validateToken(token);
+            } else {
+                setAuthUI(false);
+            }
+        }
+
+        async function validateToken(token) {
+            try {
+                const res = await fetch('https://api.github.com/user', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    const username = data.login;
+                    localStorage.setItem(STORAGE_KEY_USER, username);
+                    setAuthUI(true, username);
+                } else {
+                    localStorage.removeItem(STORAGE_KEY_PAT);
+                    localStorage.removeItem(STORAGE_KEY_USER);
+                    setAuthUI(false);
+                    showToast('Token is invalid or expired', 'error');
+                }
+            } catch {
+                setAuthUI(false);
+            }
+        }
+
+        async function connectGitHub() {
+            const token = document.getElementById('pat-input').value.trim();
+            if (!token) {
+                showToast('Please enter a token', 'error');
+                return;
+            }
+
+            // Validate
+            try {
+                const res = await fetch('https://api.github.com/user', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) {
+                    showToast('Invalid token', 'error');
+                    return;
+                }
+                const data = await res.json();
+                localStorage.setItem(STORAGE_KEY_PAT, token);
+                localStorage.setItem(STORAGE_KEY_USER, data.login);
+                setAuthUI(true, data.login);
+                closeAuthModal();
+                showToast(`Connected as ${data.login}`, 'success');
+            } catch {
+                showToast('Connection failed', 'error');
+            }
+        }
+
+        function disconnectGitHub() {
+            localStorage.removeItem(STORAGE_KEY_PAT);
+            localStorage.removeItem(STORAGE_KEY_USER);
+            fileSha = null;
+            setAuthUI(false);
+            closeAuthModal();
+            showToast('Disconnected', 'success');
+        }
+
+        function setAuthUI(connected, username) {
+            const dot = document.getElementById('auth-dot');
+            const userEl = document.getElementById('auth-user');
+            const btn = document.getElementById('auth-btn');
+            const publishBtn = document.getElementById('publish-btn');
+            const disconnectBtn = document.getElementById('disconnect-btn');
+
+            if (connected) {
+                dot.className = 'auth-dot connected';
+                userEl.textContent = username || 'Connected';
+                btn.textContent = 'GitHub';
+                publishBtn.disabled = false;
+                disconnectBtn.style.display = '';
+            } else {
+                dot.className = 'auth-dot disconnected';
+                userEl.textContent = 'Not connected';
+                btn.textContent = 'Connect GitHub';
+                publishBtn.disabled = true;
+                disconnectBtn.style.display = 'none';
+            }
+        }
+
+        function openAuthModal() {
+            document.getElementById('pat-input').value = '';
+            document.getElementById('auth-modal').classList.add('active');
+        }
+
+        function closeAuthModal() {
+            document.getElementById('auth-modal').classList.remove('active');
+        }
+
+        // ══════════════════════════════════════
+        // GitHub API: Publish
+        // ══════════════════════════════════════
+        async function publishToGitHub() {
+            if (isPublishing) return;
+            if (!isAuthenticated()) {
+                openAuthModal();
+                return;
+            }
+
+            // Auto-save current article first
+            if (currentArticleId) {
+                const saved = saveArticleSilent();
+                if (!saved) return;
+            }
+
+            isPublishing = true;
+            const publishBtn = document.getElementById('publish-btn');
+            const statusEl = document.getElementById('publish-status');
+            const statusText = document.getElementById('publish-status-text');
+
+            publishBtn.disabled = true;
+            publishBtn.textContent = 'Publishing...';
+            statusEl.style.display = 'flex';
+            statusText.textContent = 'Fetching current file...';
+
+            try {
+                const token = getToken();
+                const headers = {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/vnd.github+json'
+                };
+
+                // 1. Get current file SHA (required for update)
+                statusText.textContent = 'Fetching current file SHA...';
+                const getRes = await fetch(
+                    `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${FILE_PATH}?ref=${BRANCH}`,
+                    { headers }
+                );
+
+                if (getRes.ok) {
+                    const fileData = await getRes.json();
+                    fileSha = fileData.sha;
+                } else if (getRes.status === 404) {
+                    fileSha = null; // File doesn't exist yet, will create
+                } else {
+                    const err = await getRes.json();
+                    throw new Error(err.message || `HTTP ${getRes.status}`);
+                }
+
+                // 2. Generate content and encode to base64
+                statusText.textContent = 'Uploading...';
+                const content = generateNewsDataJS();
+                const encoded = btoa(unescape(encodeURIComponent(content)));
+
+                // 3. PUT to update/create the file
+                const putBody = {
+                    message: `Update news articles via editor`,
+                    content: encoded,
+                    branch: BRANCH
+                };
+                if (fileSha) {
+                    putBody.sha = fileSha;
+                }
+
+                const putRes = await fetch(
+                    `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${FILE_PATH}`,
+                    {
+                        method: 'PUT',
+                        headers: { ...headers, 'Content-Type': 'application/json' },
+                        body: JSON.stringify(putBody)
+                    }
+                );
+
+                if (!putRes.ok) {
+                    const err = await putRes.json();
+                    throw new Error(err.message || `HTTP ${putRes.status}`);
+                }
+
+                const result = await putRes.json();
+                fileSha = result.content.sha;
+
+                statusEl.style.display = 'none';
+                showToast('Published! Site will update shortly.', 'success');
+
+            } catch (error) {
+                statusEl.style.display = 'none';
+                showToast(`Publish failed: ${error.message}`, 'error');
+            } finally {
+                isPublishing = false;
+                publishBtn.disabled = !isAuthenticated();
+                publishBtn.textContent = 'Publish';
+            }
+        }
+
+        // ══════════════════════════════════════
+        // GitHub API: Reload from remote
+        // ══════════════════════════════════════
+        async function reloadFromRemote() {
+            if (!isAuthenticated()) {
+                showToast('Connect to GitHub first', 'error');
+                return;
+            }
+
+            try {
+                const token = getToken();
+                const res = await fetch(
+                    `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${FILE_PATH}?ref=${BRANCH}`,
+                    { headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' } }
+                );
+
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+                const data = await res.json();
+                fileSha = data.sha;
+
+                // Decode base64 content
+                const decoded = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ''))));
+
+                // Parse newsItems from the JS file content
+                // Execute in a sandboxed way
+                const fn = new Function(decoded + '\nreturn newsItems;');
+                const items = fn();
+
+                articles = JSON.parse(JSON.stringify(items));
+                currentArticleId = null;
+                document.getElementById('editor-form').style.display = 'none';
+                document.getElementById('editor-empty').style.display = 'flex';
+                renderArticleList();
+                showToast('Reloaded from GitHub', 'success');
+
+            } catch (error) {
+                showToast(`Reload failed: ${error.message}`, 'error');
+            }
+        }
+
+        // ══════════════════════════════════════
+        // Sidebar List
+        // ══════════════════════════════════════
         function renderArticleList() {
             const list = document.getElementById('article-list');
             const sorted = [...articles].sort((a, b) => {
@@ -762,15 +1189,17 @@
 
             list.innerHTML = sorted.map(item => `
                 <div class="article-list-item ${item.id === currentArticleId ? 'active' : ''}"
-                     onclick="selectArticle('${item.id}')">
-                    <div class="item-date">${item.date || ''}</div>
+                     onclick="selectArticle('${escapeAttr(item.id)}')">
+                    <div class="item-date">${escapeHtml(item.date || '')}</div>
                     <div class="item-title">${escapeHtml(item.title || 'Untitled')}</div>
-                    <span class="item-label ${item.type || ''}">${escapeHtml(item.label || item.type || '')}</span>
+                    <span class="item-label ${escapeAttr(item.type || '')}">${escapeHtml(item.label || item.type || '')}</span>
                 </div>
             `).join('');
         }
 
-        // ── Article Selection ──
+        // ══════════════════════════════════════
+        // Article Selection
+        // ══════════════════════════════════════
         function selectArticle(id) {
             currentArticleId = id;
             const article = articles.find(a => a.id === id);
@@ -779,6 +1208,7 @@
             document.getElementById('editor-empty').style.display = 'none';
             document.getElementById('editor-form').style.display = 'block';
             document.getElementById('delete-confirm').style.display = 'none';
+            document.getElementById('publish-status').style.display = 'none';
 
             document.getElementById('field-id').value = article.id || '';
             document.getElementById('field-date').value = article.date || '';
@@ -790,8 +1220,12 @@
             // Publish At
             if (article.publishAt) {
                 const d = new Date(article.publishAt);
-                const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
-                document.getElementById('field-publishat').value = local;
+                if (!isNaN(d.getTime())) {
+                    const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+                    document.getElementById('field-publishat').value = local;
+                } else {
+                    document.getElementById('field-publishat').value = '';
+                }
             } else {
                 document.getElementById('field-publishat').value = '';
             }
@@ -809,15 +1243,14 @@
                 document.getElementById('field-url').value = article.url || '';
             }
 
-            // Reset tab to write
             switchTab('write');
             renderArticleList();
-
-            // Close mobile sidebar
             document.getElementById('sidebar').classList.remove('mobile-open');
         }
 
-        // ── Create New ──
+        // ══════════════════════════════════════
+        // Create New
+        // ══════════════════════════════════════
         function createNewArticle() {
             const now = new Date();
             const dateStr = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`;
@@ -837,28 +1270,21 @@
             articles.unshift(newArticle);
             selectArticle(id);
             renderArticleList();
-
-            // Focus title
             setTimeout(() => document.getElementById('field-title').focus(), 100);
         }
 
-        // ── Save Article ──
-        function saveArticle() {
+        // ══════════════════════════════════════
+        // Save Article (local state)
+        // ══════════════════════════════════════
+        function collectFormData() {
             const idx = articles.findIndex(a => a.id === currentArticleId);
-            if (idx === -1) return;
+            if (idx === -1) return null;
 
             const newId = document.getElementById('field-id').value.trim();
-            if (!newId) {
-                showToast('ID is required', 'error');
-                return;
-            }
+            if (!newId) return null;
 
-            // Check duplicate ID
             const duplicateIdx = articles.findIndex(a => a.id === newId);
-            if (duplicateIdx !== -1 && duplicateIdx !== idx) {
-                showToast('Duplicate ID exists', 'error');
-                return;
-            }
+            if (duplicateIdx !== -1 && duplicateIdx !== idx) return null;
 
             const urlType = document.querySelector('input[name="url-type"]:checked').value;
             let url;
@@ -874,23 +1300,48 @@
                 publishAt = new Date(publishAtInput).toISOString().replace('.000Z', '+09:00');
             }
 
-            articles[idx] = {
-                id: newId,
-                date: document.getElementById('field-date').value.trim(),
-                label: document.getElementById('field-label').value.trim(),
-                type: document.getElementById('field-type').value,
-                title: document.getElementById('field-title').value.trim(),
-                publishAt: publishAt,
-                content: document.getElementById('field-content').value,
-                url: url
+            return {
+                idx,
+                data: {
+                    id: newId,
+                    date: document.getElementById('field-date').value.trim(),
+                    label: document.getElementById('field-label').value.trim(),
+                    type: document.getElementById('field-type').value,
+                    title: document.getElementById('field-title').value.trim(),
+                    publishAt: publishAt,
+                    content: document.getElementById('field-content').value,
+                    url: url
+                }
             };
+        }
 
-            currentArticleId = newId;
+        function saveArticle() {
+            const result = collectFormData();
+            if (!result) {
+                showToast('ID is required or duplicated', 'error');
+                return;
+            }
+            articles[result.idx] = result.data;
+            currentArticleId = result.data.id;
             renderArticleList();
             showToast('Article saved', 'success');
         }
 
-        // ── Delete ──
+        function saveArticleSilent() {
+            const result = collectFormData();
+            if (!result) {
+                showToast('Please fix the current article before publishing', 'error');
+                return false;
+            }
+            articles[result.idx] = result.data;
+            currentArticleId = result.data.id;
+            renderArticleList();
+            return true;
+        }
+
+        // ══════════════════════════════════════
+        // Delete
+        // ══════════════════════════════════════
         function showDeleteConfirm() {
             document.getElementById('delete-confirm').style.display = 'flex';
         }
@@ -915,7 +1366,9 @@
             renderArticleList();
         }
 
-        // ── Markdown Tabs ──
+        // ══════════════════════════════════════
+        // Markdown Tabs
+        // ══════════════════════════════════════
         function switchTab(tab) {
             const tabs = document.querySelectorAll('.markdown-tab');
             const editor = document.querySelector('.markdown-editor');
@@ -936,13 +1389,17 @@
             }
         }
 
-        // ── URL Type Toggle ──
+        // ══════════════════════════════════════
+        // URL Type Toggle
+        // ══════════════════════════════════════
         function updateUrlType() {
             const val = document.querySelector('input[name="url-type"]:checked').value;
             document.getElementById('custom-url-group').style.display = val === 'custom' ? '' : 'none';
         }
 
-        // ── Export ──
+        // ══════════════════════════════════════
+        // Export / Download (fallback)
+        // ══════════════════════════════════════
         function generateNewsDataJS() {
             const items = articles.map(item => {
                 const contentStr = item.content ? item.content.replace(/`/g, '\\`').replace(/\$\{/g, '\\${') : '';
@@ -995,16 +1452,43 @@
             showToast('Download started', 'success');
         }
 
-        // ── Mobile Sidebar ──
+        // ══════════════════════════════════════
+        // Dropdown
+        // ══════════════════════════════════════
+        function toggleDropdown() {
+            document.getElementById('more-menu').classList.toggle('open');
+        }
+
+        function closeDropdown() {
+            document.getElementById('more-menu').classList.remove('open');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.dropdown')) {
+                closeDropdown();
+            }
+        });
+
+        // ══════════════════════════════════════
+        // Mobile Sidebar
+        // ══════════════════════════════════════
         function toggleMobileSidebar() {
             document.getElementById('sidebar').classList.toggle('mobile-open');
         }
 
-        // ── Utilities ──
+        // ══════════════════════════════════════
+        // Utilities
+        // ══════════════════════════════════════
         function escapeHtml(str) {
             const div = document.createElement('div');
             div.textContent = str;
             return div.innerHTML;
+        }
+
+        function escapeAttr(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
         }
 
         function escapeSingleQuote(str) {
@@ -1018,10 +1502,12 @@
             toast.className = `toast ${type} visible`;
             setTimeout(() => {
                 toast.classList.remove('visible');
-            }, 2500);
+            }, 3000);
         }
 
-        // ── Init ──
+        // ══════════════════════════════════════
+        // Init
+        // ══════════════════════════════════════
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
