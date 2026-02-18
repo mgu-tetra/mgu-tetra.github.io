@@ -1,20 +1,5 @@
 const newsItems = [
     {
-        id: 'new-article-1771405216653',
-        date: '2026.02.18',
-        label: '活動',
-        type: 'info',
-        title: "活動しました",
-        publishAt: '2026-02-18T09:00:00+09:00',
-        content: `
-2月18日(水)
-現在大学は春休み期間真っ最中ですが、Tetraでは活動を行いました！
-また3月の活動日程が決まりましたらここで共有しますね^_^
-![todays-zuma](./images/IMG_8519.jpeg)
-        `,
-        url: './news/article.html?id=new-article-1771405216653'
-    },
-    {
         id: 'greeting-2026',
         date: '2026.01.01',
         label: 'Greeting',
