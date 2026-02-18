@@ -65,17 +65,56 @@
                 grid-template-columns: 1fr;
             }
             .sidebar {
-                display: none;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                top: auto;
+                height: 70vh;
+                z-index: 1001;
+                border-right: none;
+                border-radius: 16px 16px 0 0;
+                box-shadow: 0 -4px 32px rgba(0, 0, 0, 0.5);
+                transform: translateY(100%);
+                transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+                will-change: transform;
             }
             .sidebar.mobile-open {
-                display: block;
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                z-index: 1000;
+                transform: translateY(0);
             }
+        }
+
+        /* Bottom Sheet Backdrop */
+        .bottom-sheet-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.35s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .bottom-sheet-backdrop.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Grab Bar */
+        .grab-bar {
+            display: none;
+            width: 36px;
+            height: 5px;
+            background: #555;
+            border-radius: 3px;
+            margin: 10px auto 6px;
+            flex-shrink: 0;
+        }
+        @media (max-width: 900px) {
+            .grab-bar { display: block; }
         }
 
         /* Top Bar */
@@ -116,14 +155,24 @@
             background: none;
             border: none;
             color: var(--text);
-            font-size: 20px;
+            font-size: 22px;
             cursor: pointer;
-            padding: 4px 8px;
+            min-width: 44px;
+            min-height: 44px;
+            padding: 8px;
+            border-radius: var(--radius-sm);
+            transition: background 0.15s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .mobile-sidebar-toggle:active {
+            background: var(--surface-hover);
         }
 
         @media (max-width: 900px) {
             .mobile-sidebar-toggle {
-                display: block;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
         }
 
@@ -712,6 +761,109 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #555; }
+
+        /* ── Markdown Toolbar ── */
+        .md-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            padding: 6px 8px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-top: none;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .md-toolbar::-webkit-scrollbar { display: none; }
+        .md-toolbar-btn {
+            flex-shrink: 0;
+            min-width: 36px;
+            min-height: 36px;
+            padding: 4px 8px;
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 700;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: all 0.12s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .md-toolbar-btn:hover {
+            background: var(--surface-hover);
+            color: var(--text);
+            border-color: var(--border);
+        }
+        .md-toolbar-btn:active {
+            background: var(--accent);
+            color: #fff;
+            transform: scale(0.92);
+        }
+        .md-toolbar-sep {
+            width: 1px;
+            height: 20px;
+            background: var(--border);
+            margin: 0 4px;
+            flex-shrink: 0;
+        }
+        @media (max-width: 900px) {
+            .md-toolbar {
+                gap: 1px;
+                padding: 8px;
+            }
+            .md-toolbar-btn {
+                min-width: 40px;
+                min-height: 40px;
+                font-size: 15px;
+            }
+        }
+
+        /* ── Mobile Tap Target & Layout Improvements ── */
+        @media (max-width: 900px) {
+            .topbar {
+                padding: 8px 12px;
+            }
+            .editor-form {
+                padding: 16px;
+            }
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                font-size: 16px;
+                min-height: 44px;
+                padding: 10px 12px;
+            }
+            .btn {
+                min-height: 44px;
+                padding: 10px 16px;
+                font-size: 14px;
+            }
+            .article-list-item {
+                padding: 16px 12px;
+                margin-bottom: 4px;
+            }
+            .article-list-item .item-title {
+                font-size: 15px;
+            }
+            .markdown-editor {
+                min-height: 250px;
+                font-size: 16px;
+            }
+            .form-actions-mobile {
+                flex-direction: column;
+            }
+            .form-actions-mobile .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 
@@ -742,8 +894,12 @@
             </div>
         </div>
 
-        <!-- Sidebar -->
+        <!-- Bottom Sheet Backdrop -->
+        <div class="bottom-sheet-backdrop" id="bottom-sheet-backdrop" onclick="closeMobileSidebar()"></div>
+
+        <!-- Sidebar / Bottom Sheet -->
         <div class="sidebar" id="sidebar">
+            <div class="grab-bar" id="grab-bar"></div>
             <div class="sidebar-header">
                 <h3>Articles</h3>
                 <button class="btn btn-primary btn-sm" onclick="createNewArticle()">+ New</button>
@@ -831,14 +987,29 @@
                         <button class="markdown-tab active" onclick="switchTab('write')">Write</button>
                         <button class="markdown-tab" onclick="switchTab('preview')">Preview</button>
                     </div>
+                    <div class="md-toolbar" id="md-toolbar">
+                        <button class="md-toolbar-btn" onclick="insertMarkdown('h2')" title="Heading 2">H2</button>
+                        <button class="md-toolbar-btn" onclick="insertMarkdown('h3')" title="Heading 3">H3</button>
+                        <div class="md-toolbar-sep"></div>
+                        <button class="md-toolbar-btn" onclick="insertMarkdown('bold')" title="Bold" style="font-weight:900;">B</button>
+                        <button class="md-toolbar-btn" onclick="insertMarkdown('italic')" title="Italic" style="font-style:italic;">I</button>
+                        <div class="md-toolbar-sep"></div>
+                        <button class="md-toolbar-btn" onclick="insertMarkdown('ul')" title="Bullet List">&#8226;</button>
+                        <button class="md-toolbar-btn" onclick="insertMarkdown('ol')" title="Numbered List">1.</button>
+                        <div class="md-toolbar-sep"></div>
+                        <button class="md-toolbar-btn" onclick="insertMarkdown('link')" title="Link">&#128279;</button>
+                        <button class="md-toolbar-btn" onclick="insertMarkdown('image')" title="Image">&#128247;</button>
+                        <div class="md-toolbar-sep"></div>
+                        <button class="md-toolbar-btn" onclick="insertMarkdown('quote')" title="Blockquote">&#8220;</button>
+                    </div>
                     <textarea class="markdown-editor" id="field-content" placeholder="Write your article content in Markdown..."></textarea>
                     <div class="markdown-preview" id="markdown-preview"></div>
                 </div>
 
                 <!-- Action Buttons -->
-                <div style="display: flex; gap: 8px; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                <div class="form-actions-mobile" style="display: flex; gap: 8px; justify-content: space-between; align-items: center; flex-wrap: wrap;">
                     <button class="btn btn-danger" onclick="showDeleteConfirm()">Delete Article</button>
-                    <div style="display: flex; gap: 8px;">
+                    <div class="form-actions-mobile" style="display: flex; gap: 8px;">
                         <button class="btn" onclick="cancelEdit()">Cancel</button>
                         <button class="btn btn-primary" onclick="saveArticle()">Save Article</button>
                     </div>
@@ -1245,7 +1416,7 @@
 
             switchTab('write');
             renderArticleList();
-            document.getElementById('sidebar').classList.remove('mobile-open');
+            closeMobileSidebar();
         }
 
         // ══════════════════════════════════════
@@ -1373,6 +1544,7 @@
             const tabs = document.querySelectorAll('.markdown-tab');
             const editor = document.querySelector('.markdown-editor');
             const preview = document.getElementById('markdown-preview');
+            const toolbar = document.getElementById('md-toolbar');
 
             tabs.forEach(t => t.classList.remove('active'));
 
@@ -1380,10 +1552,12 @@
                 tabs[0].classList.add('active');
                 editor.style.display = 'block';
                 preview.style.display = 'none';
+                if (toolbar) toolbar.style.display = 'flex';
             } else {
                 tabs[1].classList.add('active');
                 editor.style.display = 'none';
                 preview.style.display = 'block';
+                if (toolbar) toolbar.style.display = 'none';
                 const raw = marked.parse(document.getElementById('field-content').value);
                 preview.innerHTML = DOMPurify.sanitize(raw);
             }
@@ -1471,10 +1645,196 @@
         });
 
         // ══════════════════════════════════════
-        // Mobile Sidebar
+        // Mobile Bottom Sheet
         // ══════════════════════════════════════
         function toggleMobileSidebar() {
-            document.getElementById('sidebar').classList.toggle('mobile-open');
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar.classList.contains('mobile-open')) {
+                closeMobileSidebar();
+            } else {
+                openMobileSidebar();
+            }
+        }
+
+        function openMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('bottom-sheet-backdrop');
+            sidebar.classList.add('mobile-open');
+            backdrop.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('bottom-sheet-backdrop');
+            sidebar.classList.remove('mobile-open');
+            sidebar.style.transform = '';
+            backdrop.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Swipe-to-close for bottom sheet
+        (function initBottomSheetSwipe() {
+            let startY = 0;
+            let currentY = 0;
+            let isDragging = false;
+
+            document.addEventListener('DOMContentLoaded', () => {
+                const grabBar = document.getElementById('grab-bar');
+                const sidebar = document.getElementById('sidebar');
+                if (!grabBar || !sidebar) return;
+
+                const onTouchStart = (e) => {
+                    if (!sidebar.classList.contains('mobile-open')) return;
+                    isDragging = true;
+                    startY = e.touches[0].clientY;
+                    currentY = startY;
+                    sidebar.style.transition = 'none';
+                };
+
+                const onTouchMove = (e) => {
+                    if (!isDragging) return;
+                    currentY = e.touches[0].clientY;
+                    const deltaY = currentY - startY;
+                    if (deltaY > 0) {
+                        sidebar.style.transform = `translateY(${deltaY}px)`;
+                    }
+                };
+
+                const onTouchEnd = () => {
+                    if (!isDragging) return;
+                    isDragging = false;
+                    sidebar.style.transition = '';
+                    const deltaY = currentY - startY;
+                    if (deltaY > 100) {
+                        closeMobileSidebar();
+                    } else {
+                        sidebar.style.transform = 'translateY(0)';
+                    }
+                };
+
+                grabBar.addEventListener('touchstart', onTouchStart, { passive: true });
+                grabBar.addEventListener('touchmove', onTouchMove, { passive: true });
+                grabBar.addEventListener('touchend', onTouchEnd, { passive: true });
+
+                // Also allow dragging from sidebar header area
+                const sidebarHeader = sidebar.querySelector('.sidebar-header');
+                if (sidebarHeader) {
+                    sidebarHeader.addEventListener('touchstart', onTouchStart, { passive: true });
+                    sidebarHeader.addEventListener('touchmove', onTouchMove, { passive: true });
+                    sidebarHeader.addEventListener('touchend', onTouchEnd, { passive: true });
+                }
+            });
+        })();
+
+        // ══════════════════════════════════════
+        // Markdown Toolbar Insert
+        // ══════════════════════════════════════
+        function insertMarkdown(type) {
+            const textarea = document.getElementById('field-content');
+            if (!textarea) return;
+
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const text = textarea.value;
+            const selected = text.substring(start, end);
+
+            let before = '';
+            let after = '';
+            let placeholder = '';
+            let cursorOffset = 0;
+            let isPrefix = false;
+
+            switch (type) {
+                case 'h2':
+                    isPrefix = true;
+                    before = '## ';
+                    placeholder = 'Heading';
+                    break;
+                case 'h3':
+                    isPrefix = true;
+                    before = '### ';
+                    placeholder = 'Heading';
+                    break;
+                case 'bold':
+                    before = '**';
+                    after = '**';
+                    placeholder = 'bold text';
+                    break;
+                case 'italic':
+                    before = '*';
+                    after = '*';
+                    placeholder = 'italic text';
+                    break;
+                case 'ul':
+                    isPrefix = true;
+                    before = '- ';
+                    placeholder = 'list item';
+                    break;
+                case 'ol':
+                    isPrefix = true;
+                    before = '1. ';
+                    placeholder = 'list item';
+                    break;
+                case 'link':
+                    if (selected) {
+                        before = '[';
+                        after = '](url)';
+                        cursorOffset = -1; // place cursor inside (url)
+                    } else {
+                        before = '[';
+                        after = '](url)';
+                        placeholder = 'link text';
+                    }
+                    break;
+                case 'image':
+                    before = '![';
+                    after = '](image-url)';
+                    placeholder = 'alt text';
+                    break;
+                case 'quote':
+                    isPrefix = true;
+                    before = '> ';
+                    placeholder = 'quote';
+                    break;
+            }
+
+            if (isPrefix) {
+                // Find the start of the current line
+                const lineStart = text.lastIndexOf('\n', start - 1) + 1;
+                const insertText = selected || placeholder;
+                const newText = text.substring(0, lineStart) + before + text.substring(lineStart);
+
+                if (selected) {
+                    textarea.value = newText;
+                    textarea.selectionStart = start + before.length;
+                    textarea.selectionEnd = end + before.length;
+                } else {
+                    // Insert prefix + placeholder at line start, replacing from line start to start
+                    const currentLineContent = text.substring(lineStart, start);
+                    textarea.value = text.substring(0, lineStart) + before + currentLineContent + insertText + text.substring(start);
+                    const newCursor = lineStart + before.length + currentLineContent.length;
+                    textarea.selectionStart = newCursor;
+                    textarea.selectionEnd = newCursor + insertText.length;
+                }
+            } else {
+                // Wrap type
+                const insertText = selected || placeholder;
+                const newText = text.substring(0, start) + before + insertText + after + text.substring(end);
+                textarea.value = newText;
+
+                if (selected) {
+                    textarea.selectionStart = start + before.length;
+                    textarea.selectionEnd = start + before.length + selected.length;
+                } else {
+                    textarea.selectionStart = start + before.length;
+                    textarea.selectionEnd = start + before.length + placeholder.length;
+                }
+            }
+
+            textarea.focus();
+            // Trigger input event for any listeners
+            textarea.dispatchEvent(new Event('input', { bubbles: true }));
         }
 
         // ══════════════════════════════════════
