@@ -1,15 +1,32 @@
 const newsItems = [
     {
+        id: 'new-article-1771405216653',
+        date: '2026.02.18',
+        label: '活動',
+        type: 'info',
+        title: "活動しました",
+        publishAt: '2026-02-18T09:00:00+09:00',
+        content: `
+2月18日(水)
+現在大学は春休み期間真っ最中ですが、Tetraでは活動を行いました！
+また3月の活動日程が決まりましたらここで共有しますね^_^
+![todays-zuma](./images/IMG_8519.jpeg)
+        `,
+        url: './news/article.html?id=new-article-1771405216653'
+    },
+    {
         id: 'greeting-2026',
         date: '2026.01.01',
         label: 'Greeting',
         type: 'event',
-        title: '2026年 新年のご挨拶',
+        title: "2026年 新年のご挨拶",
         publishAt: '2025-12-31T00:00:00+09:00',
         content: `
+
 ## 新年、あけましておめでとうございます。
 
 2026年も、新しい景色を求めて。
+        
         `,
         url: './greeting_newyear_2026.html'
     },
@@ -18,9 +35,10 @@ const newsItems = [
         date: '2025.12.31',
         label: 'Notice',
         type: 'notice',
-        title: 'Webサイトリニューアルのお知らせ',
+        title: "Webサイトリニューアルのお知らせ",
         publishAt: '2025-12-31T00:00:00+09:00',
         content: `
+
 ## Webサイトをリニューアルしました
 
 Tetraの公式Webサイトが新しくなりました！
@@ -31,6 +49,7 @@ Tetraの公式Webサイトが新しくなりました！
 3. **モバイル対応**: スマートフォンでも快適に見られるように最適化しました。
 
 今後ともTetraをよろしくお願いいたします。
+        
         `,
         url: './news/article.html?id=website-renewal'
     },
@@ -39,9 +58,10 @@ Tetraの公式Webサイトが新しくなりました！
         date: '2025.12.31',
         label: 'Info',
         type: 'info',
-        title: 'サークル長からのご挨拶',
+        title: "サークル長からのご挨拶",
         publishAt: '2025-12-31T00:00:00+09:00',
         content: `
+
 ## ご挨拶
 
 こんにちは、Tetraサークル長の入内嶋です。
@@ -55,6 +75,7 @@ Tetraの公式Webサイトが新しくなりました！
 - グラフィックデザイン
 
 興味のある方は、ぜひ一度見学にいらしてください！
+        
         `,
         url: './news/article.html?id=message-from-leader'
     },
@@ -66,12 +87,14 @@ Tetraの公式Webサイトが新しくなりました！
         title: "新サークル『Tetra』活動開始",
         publishAt: '2024-09-20T00:00:00+09:00',
         content: `
+
 ## 新サークル『Tetra』始動
 
 本日、新しいサークル『Tetra』が活動を開始しました。
 
 ### Tetraとは？
-Tetraは、明治学院大学情報数理学部の学生4名で設立したサークルです。`,
+Tetraは、明治学院大学情報数理学部の学生4名で設立したサークルです。
+        `,
         url: './news/article.html?id=tetra-launch'
     }
 ];
