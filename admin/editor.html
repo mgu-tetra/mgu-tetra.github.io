@@ -358,6 +358,7 @@
             cursor: pointer;
             transition: background 0.15s;
             margin-bottom: 2px;
+            position: relative;
         }
 
         .article-list-item:hover {
@@ -825,6 +826,124 @@
             }
         }
 
+        /* ── Validation ── */
+        .input-error { border-color: var(--danger) !important; }
+        .field-hint {
+            font-size: 11px;
+            color: var(--danger);
+            margin-top: 2px;
+            display: none;
+        }
+        .field-hint.visible { display: block; }
+
+        /* ── Article Status Badges ── */
+        .status-badge {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            margin-left: 4px;
+            vertical-align: middle;
+        }
+        .status-draft { background: rgba(255, 69, 58, 0.15); color: var(--danger); }
+        .status-scheduled { background: rgba(255, 159, 10, 0.15); color: var(--warning); }
+
+        /* ── Sidebar Search ── */
+        .sidebar-search {
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        .sidebar-search input {
+            width: 100%;
+            padding: 7px 10px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 13px;
+            outline: none;
+            font-family: var(--font);
+        }
+        .sidebar-search input:focus { border-color: var(--border-focus); }
+
+        /* ── Duplicate Button ── */
+        .item-duplicate-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: none;
+            border: 1px solid transparent;
+            color: var(--text-secondary);
+            font-size: 13px;
+            border-radius: 6px;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.12s;
+            line-height: 1;
+        }
+        .article-list-item:hover .item-duplicate-btn { opacity: 1; border-color: var(--border); }
+        .item-duplicate-btn:hover { background: var(--surface-raised); color: var(--text); }
+
+        /* ── Draft Restore Banner ── */
+        .draft-restore-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: rgba(255, 159, 10, 0.08);
+            border: 1px solid rgba(255, 159, 10, 0.3);
+            border-radius: var(--radius-sm);
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: var(--warning);
+        }
+        .draft-restore-bar .confirm-text { flex: 1; }
+
+        /* ── Image Upload Modal ── */
+        .upload-drop-zone {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius-sm);
+            padding: 32px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.15s;
+            margin-bottom: 12px;
+        }
+        .upload-drop-zone:hover, .upload-drop-zone.drag-over { border-color: var(--accent); }
+        .upload-drop-zone input { display: none; }
+        .upload-drop-zone p { color: var(--text-secondary); font-size: 14px; margin-top: 8px; }
+        .upload-preview {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+        .upload-preview img { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; }
+        .upload-preview-info { flex: 1; }
+        .upload-preview-name { font-weight: 600; }
+        .upload-preview-size { color: var(--text-secondary); font-size: 12px; }
+        .auth-remember {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+        .auth-remember input { accent-color: var(--accent); }
+
         /* ── Mobile Tap Target & Layout Improvements ── */
         @media (max-width: 900px) {
             .topbar {
@@ -904,6 +1023,9 @@
                 <h3>Articles</h3>
                 <button class="btn btn-primary btn-sm" onclick="createNewArticle()">+ New</button>
             </div>
+            <div class="sidebar-search">
+                <input type="search" id="article-search" placeholder="Search articles..." oninput="handleSearch(this.value)">
+            </div>
             <div class="article-list" id="article-list">
                 <!-- Dynamic -->
             </div>
@@ -925,6 +1047,13 @@
                     <span id="publish-status-text">Publishing...</span>
                 </div>
 
+                <!-- Draft Restore Banner -->
+                <div class="draft-restore-bar" id="draft-restore-bar" style="display: none;">
+                    <span class="confirm-text">&#128196; Unsaved draft found. Restore?</span>
+                    <button class="btn btn-sm" style="border-color: var(--warning); color: var(--warning);" onclick="restoreDraft()">Restore</button>
+                    <button class="btn btn-sm" onclick="dismissDraft()">Discard</button>
+                </div>
+
                 <!-- Delete Confirm -->
                 <div class="confirm-bar" id="delete-confirm" style="display: none;">
                     <span class="confirm-text">Delete this article?</span>
@@ -940,10 +1069,12 @@
                     <div class="form-group">
                         <label for="field-date">Date</label>
                         <input type="text" id="field-date" placeholder="2026.01.01">
+                        <span class="field-hint" id="hint-date">Format: YYYY.MM.DD</span>
                     </div>
                     <div class="form-group full-width">
-                        <label for="field-title">Title</label>
+                        <label for="field-title">Title <span style="color:var(--danger)">*</span></label>
                         <input type="text" id="field-title" placeholder="Article title">
+                        <span class="field-hint" id="hint-title">Title is required</span>
                     </div>
                     <div class="form-group">
                         <label for="field-type">Type</label>
@@ -1001,6 +1132,8 @@
                         <button class="md-toolbar-btn" onclick="insertMarkdown('image')" title="Image">&#128247;</button>
                         <div class="md-toolbar-sep"></div>
                         <button class="md-toolbar-btn" onclick="insertMarkdown('quote')" title="Blockquote">&#8220;</button>
+                        <div class="md-toolbar-sep"></div>
+                        <button class="md-toolbar-btn" onclick="openImageUploadModal()" title="Upload Image">&#128228;</button>
                     </div>
                     <textarea class="markdown-editor" id="field-content" placeholder="Write your article content in Markdown..."></textarea>
                     <div class="markdown-preview" id="markdown-preview"></div>
@@ -1030,9 +1163,13 @@
                     <div class="auth-help">
                         <p>Personal Access Token (Fine-grained) that has <strong>Contents: Read and write</strong> permission for <code>mgu-tetra/mgu-tetra.github.io</code>.</p>
                         <br>
-                        <p>Token is stored only in this browser's localStorage.</p>
+                        <p>Generate one at <a href="https://github.com/settings/tokens?type=beta" target="_blank">GitHub Settings → Fine-grained tokens</a>.</p>
                     </div>
                     <input type="password" id="pat-input" placeholder="github_pat_xxxx...">
+                    <label class="auth-remember">
+                        <input type="checkbox" id="remember-pat" checked>
+                        Remember token in this browser (localStorage)
+                    </label>
                 </div>
             </div>
             <div class="modal-footer">
@@ -1063,6 +1200,43 @@
         </div>
     </div>
 
+    <!-- Image Upload Modal -->
+    <div class="modal-backdrop" id="image-upload-modal">
+        <div class="modal" style="max-width: 480px;">
+            <div class="modal-header">
+                <h2>Upload Image</h2>
+                <button class="btn btn-sm" onclick="closeImageUploadModal()">Close</button>
+            </div>
+            <div class="modal-body">
+                <div class="upload-drop-zone" id="upload-drop-zone" onclick="document.getElementById('upload-file-input').click()">
+                    <input type="file" id="upload-file-input" accept="image/*" onchange="handleFileSelected(this.files[0])">
+                    <div style="font-size: 32px;">&#128247;</div>
+                    <p>Click to select an image (max 1 MB)</p>
+                </div>
+                <div class="upload-preview" id="upload-preview">
+                    <img id="upload-preview-img" src="" alt="preview">
+                    <div class="upload-preview-info">
+                        <div class="upload-preview-name" id="upload-preview-name"></div>
+                        <div class="upload-preview-size" id="upload-preview-size"></div>
+                    </div>
+                    <button class="btn btn-sm" onclick="clearUploadFile()">&#10005;</button>
+                </div>
+                <div class="form-group">
+                    <label for="upload-filename">Filename in /images/</label>
+                    <input type="text" id="upload-filename" placeholder="my-image.jpg">
+                </div>
+                <div class="publish-status" id="upload-status" style="display: none;">
+                    <div class="spinner"></div>
+                    <span id="upload-status-text">Uploading...</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeImageUploadModal()">Cancel</button>
+                <button class="btn btn-primary" id="upload-confirm-btn" onclick="uploadImage()" disabled>Upload & Insert</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast -->
     <div class="toast" id="toast"></div>
 
@@ -1079,6 +1253,8 @@
         const BRANCH = 'main';
         const STORAGE_KEY_PAT = 'tetra_github_pat';
         const STORAGE_KEY_USER = 'tetra_github_user';
+        const STORAGE_KEY_DRAFT = 'tetra_draft_articles';
+        const STORAGE_KEY_LAST_PUBLISHED = 'tetra_last_published';
 
         // ══════════════════════════════════════
         // State
@@ -1087,6 +1263,10 @@
         let currentArticleId = null;
         let fileSha = null; // Required by GitHub API to update a file
         let isPublishing = false;
+        let isDirty = false;
+        let autoSaveTimer = null;
+        let searchQuery = '';
+        let uploadFileData = null; // { base64, name, size }
 
         // ══════════════════════════════════════
         // Init
@@ -1097,13 +1277,55 @@
             }
             renderArticleList();
             restoreAuth();
+
+            // Check for unsaved draft
+            checkForDraft();
+
+            // Unsaved changes warning
+            window.addEventListener('beforeunload', (e) => {
+                if (isDirty) {
+                    e.preventDefault();
+                    e.returnValue = '';
+                }
+            });
+
+            // Auto-save on form input (debounced 1500ms)
+            document.getElementById('editor-form').addEventListener('input', () => {
+                isDirty = true;
+                clearTimeout(autoSaveTimer);
+                autoSaveTimer = setTimeout(() => {
+                    if (currentArticleId) {
+                        const result = collectFormData();
+                        if (result) {
+                            const draft = articles.map((a, i) => i === result.idx ? result.data : a);
+                            localStorage.setItem(STORAGE_KEY_DRAFT, JSON.stringify({
+                                ts: Date.now(),
+                                articles: draft
+                            }));
+                        }
+                    }
+                }, 1500);
+            });
+
+            // Image upload drag-and-drop
+            const dropZone = document.getElementById('upload-drop-zone');
+            if (dropZone) {
+                dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+                dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+                dropZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.remove('drag-over');
+                    const file = e.dataTransfer.files[0];
+                    if (file) handleFileSelected(file);
+                });
+            }
         }
 
         // ══════════════════════════════════════
         // GitHub Authentication
         // ══════════════════════════════════════
         function getToken() {
-            return localStorage.getItem(STORAGE_KEY_PAT);
+            return sessionStorage.getItem(STORAGE_KEY_PAT) || localStorage.getItem(STORAGE_KEY_PAT);
         }
 
         function isAuthenticated() {
@@ -1112,11 +1334,10 @@
 
         function restoreAuth() {
             const token = getToken();
-            const user = localStorage.getItem(STORAGE_KEY_USER);
+            const user = sessionStorage.getItem(STORAGE_KEY_USER) || localStorage.getItem(STORAGE_KEY_USER);
             if (token && user) {
                 setAuthUI(true, user);
             } else if (token) {
-                // Validate token
                 validateToken(token);
             } else {
                 setAuthUI(false);
@@ -1131,11 +1352,18 @@
                 if (res.ok) {
                     const data = await res.json();
                     const username = data.login;
-                    localStorage.setItem(STORAGE_KEY_USER, username);
+                    // Store user in same storage as token
+                    if (localStorage.getItem(STORAGE_KEY_PAT) === token) {
+                        localStorage.setItem(STORAGE_KEY_USER, username);
+                    } else {
+                        sessionStorage.setItem(STORAGE_KEY_USER, username);
+                    }
                     setAuthUI(true, username);
                 } else {
                     localStorage.removeItem(STORAGE_KEY_PAT);
                     localStorage.removeItem(STORAGE_KEY_USER);
+                    sessionStorage.removeItem(STORAGE_KEY_PAT);
+                    sessionStorage.removeItem(STORAGE_KEY_USER);
                     setAuthUI(false);
                     showToast('Token is invalid or expired', 'error');
                 }
@@ -1151,7 +1379,6 @@
                 return;
             }
 
-            // Validate
             try {
                 const res = await fetch('https://api.github.com/user', {
                     headers: { 'Authorization': `Bearer ${token}` }
@@ -1161,8 +1388,14 @@
                     return;
                 }
                 const data = await res.json();
-                localStorage.setItem(STORAGE_KEY_PAT, token);
-                localStorage.setItem(STORAGE_KEY_USER, data.login);
+                const remember = document.getElementById('remember-pat').checked;
+                if (remember) {
+                    localStorage.setItem(STORAGE_KEY_PAT, token);
+                    localStorage.setItem(STORAGE_KEY_USER, data.login);
+                } else {
+                    sessionStorage.setItem(STORAGE_KEY_PAT, token);
+                    sessionStorage.setItem(STORAGE_KEY_USER, data.login);
+                }
                 setAuthUI(true, data.login);
                 closeAuthModal();
                 showToast(`Connected as ${data.login}`, 'success');
@@ -1174,6 +1407,8 @@
         function disconnectGitHub() {
             localStorage.removeItem(STORAGE_KEY_PAT);
             localStorage.removeItem(STORAGE_KEY_USER);
+            sessionStorage.removeItem(STORAGE_KEY_PAT);
+            sessionStorage.removeItem(STORAGE_KEY_USER);
             fileSha = null;
             setAuthUI(false);
             closeAuthModal();
@@ -1294,6 +1529,9 @@
                 fileSha = result.content.sha;
 
                 statusEl.style.display = 'none';
+                isDirty = false;
+                localStorage.setItem(STORAGE_KEY_LAST_PUBLISHED, Date.now());
+                localStorage.removeItem(STORAGE_KEY_DRAFT);
                 showToast('Published! Site will update shortly.', 'success');
 
             } catch (error) {
@@ -1350,22 +1588,54 @@
         // ══════════════════════════════════════
         // Sidebar List
         // ══════════════════════════════════════
+        function getArticleStatus(article) {
+            if (!article.title || !article.title.trim()) return 'draft';
+            if (article.publishAt) {
+                const pub = new Date(article.publishAt);
+                if (!isNaN(pub.getTime()) && pub > new Date()) return 'scheduled';
+            }
+            return 'published';
+        }
+
         function renderArticleList() {
             const list = document.getElementById('article-list');
+            const q = searchQuery.toLowerCase();
             const sorted = [...articles].sort((a, b) => {
                 const da = a.date ? a.date.replace(/\./g, '') : '0';
                 const db = b.date ? b.date.replace(/\./g, '') : '0';
                 return db.localeCompare(da);
             });
 
-            list.innerHTML = sorted.map(item => `
+            const filtered = q
+                ? sorted.filter(a => [a.title, a.id, a.label].some(s => s && s.toLowerCase().includes(q)))
+                : sorted;
+
+            if (filtered.length === 0) {
+                list.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-secondary);font-size:13px;">No articles found</div>`;
+                return;
+            }
+
+            list.innerHTML = filtered.map(item => {
+                const status = getArticleStatus(item);
+                const statusBadge = status === 'draft'
+                    ? `<span class="status-badge status-draft">Draft</span>`
+                    : status === 'scheduled'
+                    ? `<span class="status-badge status-scheduled">Scheduled</span>`
+                    : '';
+                return `
                 <div class="article-list-item ${item.id === currentArticleId ? 'active' : ''}"
                      onclick="selectArticle('${escapeAttr(item.id)}')">
                     <div class="item-date">${escapeHtml(item.date || '')}</div>
-                    <div class="item-title">${escapeHtml(item.title || 'Untitled')}</div>
+                    <div class="item-title">${escapeHtml(item.title || 'Untitled')}${statusBadge}</div>
                     <span class="item-label ${escapeAttr(item.type || '')}">${escapeHtml(item.label || item.type || '')}</span>
+                    <button class="item-duplicate-btn" onclick="duplicateArticle('${escapeAttr(item.id)}', event)" title="Duplicate">&#10697;</button>
                 </div>
-            `).join('');
+            `}).join('');
+        }
+
+        function handleSearch(value) {
+            searchQuery = value;
+            renderArticleList();
         }
 
         // ══════════════════════════════════════
@@ -1447,15 +1717,67 @@
         // ══════════════════════════════════════
         // Save Article (local state)
         // ══════════════════════════════════════
-        function collectFormData() {
+        function clearFieldError(fieldId, hintId) {
+            document.getElementById(fieldId).classList.remove('input-error');
+            const hint = document.getElementById(hintId);
+            if (hint) hint.classList.remove('visible');
+        }
+
+        function setFieldError(fieldId, hintId) {
+            document.getElementById(fieldId).classList.add('input-error');
+            const hint = document.getElementById(hintId);
+            if (hint) hint.classList.add('visible');
+        }
+
+        function collectFormData(silent = false) {
             const idx = articles.findIndex(a => a.id === currentArticleId);
             if (idx === -1) return null;
 
-            const newId = document.getElementById('field-id').value.trim();
-            if (!newId) return null;
+            // Auto-generate ID from title if it's still the default timestamp ID
+            const titleVal = document.getElementById('field-title').value.trim();
+            const idField = document.getElementById('field-id');
+            if (idField.value.startsWith('new-article-') && titleVal) {
+                const slug = titleVal.toLowerCase()
+                    .replace(/[\u3040-\u30FF\u4E00-\u9FFF]+/g, (m) => m) // keep Japanese as-is
+                    .replace(/\s+/g, '-')
+                    .replace(/[^a-z0-9\-\u3040-\u30FF\u4E00-\u9FFF]/g, '')
+                    .replace(/-+/g, '-')
+                    .slice(0, 60);
+                if (slug) idField.value = slug;
+            }
+
+            const newId = idField.value.trim();
+
+            // Validate ID
+            if (!newId) {
+                if (!silent) setFieldError('field-id', null);
+                return null;
+            }
+            clearFieldError('field-id', null);
 
             const duplicateIdx = articles.findIndex(a => a.id === newId);
-            if (duplicateIdx !== -1 && duplicateIdx !== idx) return null;
+            if (duplicateIdx !== -1 && duplicateIdx !== idx) {
+                if (!silent) setFieldError('field-id', null);
+                return null;
+            }
+
+            // Validate title
+            clearFieldError('field-title', 'hint-title');
+            if (!titleVal) {
+                if (!silent) {
+                    setFieldError('field-title', 'hint-title');
+                    document.getElementById('field-title').focus();
+                }
+                return null;
+            }
+
+            // Validate date format
+            const dateVal = document.getElementById('field-date').value.trim();
+            clearFieldError('field-date', 'hint-date');
+            if (dateVal && !/^\d{4}\.\d{2}\.\d{2}$/.test(dateVal)) {
+                if (!silent) setFieldError('field-date', 'hint-date');
+                return null;
+            }
 
             const urlType = document.querySelector('input[name="url-type"]:checked').value;
             let url;
@@ -1475,10 +1797,10 @@
                 idx,
                 data: {
                     id: newId,
-                    date: document.getElementById('field-date').value.trim(),
+                    date: dateVal,
                     label: document.getElementById('field-label').value.trim(),
                     type: document.getElementById('field-type').value,
-                    title: document.getElementById('field-title').value.trim(),
+                    title: titleVal,
                     publishAt: publishAt,
                     content: document.getElementById('field-content').value,
                     url: url
@@ -1489,17 +1811,19 @@
         function saveArticle() {
             const result = collectFormData();
             if (!result) {
-                showToast('ID is required or duplicated', 'error');
+                showToast('Please fix the errors above', 'error');
                 return;
             }
             articles[result.idx] = result.data;
             currentArticleId = result.data.id;
+            isDirty = false;
+            localStorage.removeItem(STORAGE_KEY_DRAFT);
             renderArticleList();
             showToast('Article saved', 'success');
         }
 
         function saveArticleSilent() {
-            const result = collectFormData();
+            const result = collectFormData(true);
             if (!result) {
                 showToast('Please fix the current article before publishing', 'error');
                 return false;
@@ -1524,6 +1848,8 @@
         function confirmDelete() {
             articles = articles.filter(a => a.id !== currentArticleId);
             currentArticleId = null;
+            isDirty = false;
+            localStorage.removeItem(STORAGE_KEY_DRAFT);
             document.getElementById('editor-form').style.display = 'none';
             document.getElementById('editor-empty').style.display = 'flex';
             renderArticleList();
@@ -1835,6 +2161,202 @@
             textarea.focus();
             // Trigger input event for any listeners
             textarea.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+
+        // ══════════════════════════════════════
+        // Draft Management
+        // ══════════════════════════════════════
+        function checkForDraft() {
+            const raw = localStorage.getItem(STORAGE_KEY_DRAFT);
+            if (!raw) return;
+            try {
+                const draft = JSON.parse(raw);
+                const lastPub = parseInt(localStorage.getItem(STORAGE_KEY_LAST_PUBLISHED) || '0', 10);
+                if (draft.ts > lastPub) {
+                    document.getElementById('draft-restore-bar').style.display = 'flex';
+                } else {
+                    localStorage.removeItem(STORAGE_KEY_DRAFT);
+                }
+            } catch {
+                localStorage.removeItem(STORAGE_KEY_DRAFT);
+            }
+        }
+
+        function restoreDraft() {
+            const raw = localStorage.getItem(STORAGE_KEY_DRAFT);
+            if (!raw) return;
+            try {
+                const draft = JSON.parse(raw);
+                articles = draft.articles;
+                currentArticleId = null;
+                document.getElementById('editor-form').style.display = 'none';
+                document.getElementById('editor-empty').style.display = 'flex';
+                document.getElementById('draft-restore-bar').style.display = 'none';
+                renderArticleList();
+                showToast('Draft restored', 'success');
+            } catch {
+                showToast('Failed to restore draft', 'error');
+            }
+        }
+
+        function dismissDraft() {
+            localStorage.removeItem(STORAGE_KEY_DRAFT);
+            document.getElementById('draft-restore-bar').style.display = 'none';
+        }
+
+        // ══════════════════════════════════════
+        // Duplicate Article
+        // ══════════════════════════════════════
+        function duplicateArticle(id, event) {
+            event.stopPropagation();
+            const src = articles.find(a => a.id === id);
+            if (!src) return;
+            const copy = {
+                ...src,
+                id: 'copy-' + src.id + '-' + Date.now(),
+                title: (src.title || 'Untitled') + ' (Copy)'
+            };
+            articles.unshift(copy);
+            renderArticleList();
+            selectArticle(copy.id);
+            showToast('Article duplicated', 'success');
+        }
+
+        // ══════════════════════════════════════
+        // Image Upload (GitHub Contents API)
+        // ══════════════════════════════════════
+        function openImageUploadModal() {
+            clearUploadFile();
+            document.getElementById('image-upload-modal').classList.add('active');
+        }
+
+        function closeImageUploadModal() {
+            document.getElementById('image-upload-modal').classList.remove('active');
+            clearUploadFile();
+        }
+
+        function clearUploadFile() {
+            uploadFileData = null;
+            document.getElementById('upload-file-input').value = '';
+            document.getElementById('upload-preview').style.display = 'none';
+            document.getElementById('upload-drop-zone').style.display = '';
+            document.getElementById('upload-confirm-btn').disabled = true;
+            document.getElementById('upload-filename').value = '';
+        }
+
+        function handleFileSelected(file) {
+            if (!file) return;
+            if (file.size > 1_000_000) {
+                showToast('File too large (max 1 MB)', 'error');
+                return;
+            }
+            if (!file.type.startsWith('image/')) {
+                showToast('Please select an image file', 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const dataUrl = e.target.result;
+                // Extract base64 (strip data:image/xxx;base64, prefix)
+                const base64 = dataUrl.split(',')[1];
+                uploadFileData = { base64, name: file.name, size: file.size, type: file.type };
+
+                // Show preview
+                document.getElementById('upload-preview-img').src = dataUrl;
+                document.getElementById('upload-preview-name').textContent = file.name;
+                document.getElementById('upload-preview-size').textContent = (file.size / 1024).toFixed(1) + ' KB';
+                document.getElementById('upload-preview').style.display = 'flex';
+                document.getElementById('upload-drop-zone').style.display = 'none';
+                document.getElementById('upload-filename').value = file.name;
+                document.getElementById('upload-confirm-btn').disabled = false;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function uploadImage() {
+            if (!uploadFileData) return;
+            if (!isAuthenticated()) {
+                showToast('Connect to GitHub first', 'error');
+                return;
+            }
+
+            const filename = document.getElementById('upload-filename').value.trim() || uploadFileData.name;
+            if (!filename) {
+                showToast('Please enter a filename', 'error');
+                return;
+            }
+
+            const imagePath = `images/${filename}`;
+            const token = getToken();
+            const headers = {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/vnd.github+json'
+            };
+
+            const statusEl = document.getElementById('upload-status');
+            const statusText = document.getElementById('upload-status-text');
+            const confirmBtn = document.getElementById('upload-confirm-btn');
+
+            confirmBtn.disabled = true;
+            statusEl.style.display = 'flex';
+            statusText.textContent = 'Checking existing file...';
+
+            try {
+                // Check if file already exists (need SHA to overwrite)
+                let existingSha = null;
+                const checkRes = await fetch(
+                    `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${imagePath}?ref=${BRANCH}`,
+                    { headers }
+                );
+                if (checkRes.ok) {
+                    const checkData = await checkRes.json();
+                    existingSha = checkData.sha;
+                }
+
+                statusText.textContent = 'Uploading image...';
+                const putBody = {
+                    message: `Upload image: ${filename}`,
+                    content: uploadFileData.base64,
+                    branch: BRANCH
+                };
+                if (existingSha) putBody.sha = existingSha;
+
+                const putRes = await fetch(
+                    `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${imagePath}`,
+                    {
+                        method: 'PUT',
+                        headers: { ...headers, 'Content-Type': 'application/json' },
+                        body: JSON.stringify(putBody)
+                    }
+                );
+
+                if (!putRes.ok) {
+                    const err = await putRes.json();
+                    throw new Error(err.message || `HTTP ${putRes.status}`);
+                }
+
+                // Insert markdown into textarea
+                const rawUrl = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main/${imagePath}`;
+                const mdSnippet = `![${filename}](${rawUrl})`;
+                const textarea = document.getElementById('field-content');
+                if (textarea) {
+                    const pos = textarea.selectionStart;
+                    const before = textarea.value.substring(0, pos);
+                    const after = textarea.value.substring(pos);
+                    textarea.value = before + '\n' + mdSnippet + '\n' + after;
+                    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+
+                closeImageUploadModal();
+                showToast('Image uploaded and inserted!', 'success');
+
+            } catch (error) {
+                showToast(`Upload failed: ${error.message}`, 'error');
+            } finally {
+                statusEl.style.display = 'none';
+                confirmBtn.disabled = false;
+            }
         }
 
         // ══════════════════════════════════════
