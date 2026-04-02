@@ -13,7 +13,7 @@ const newsItems = [
 2026年も、新しい景色を求めて。
         
         `,
-        url: './greeting_newyear_2026.html'
+        url: './news/greeting_newyear_2026.html'
     },
     {
         id: 'website-renewal',
