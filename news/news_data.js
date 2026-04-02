@@ -1,5 +1,20 @@
 const newsItems = [
     {
+        id: '2026年度tetra始動',
+        date: '2026.04.02',
+        label: 'Info',
+        type: 'info',
+        title: "2026年度Tetra始動",
+        publishAt: '2026-04-02T00:57:00+09:00',
+        content: `
+2026年度の開始に伴いTetraでは、新メンバーの募集をスタートしました。4月1日、4月2日は明治学院大学白金キャンパスで新入生向けのビラ配布を実施ております。また、4月3日、4月6日には同横浜キャンパスでブースを設置いたします。
+4月6日以降4月中は月曜・水曜に活動を行いますので、ぜひお気軽にお越しください！
+
+詳しい情報は随時公式[Instagram](https://www.instagram.com/tetra.00000100?igsh=MWptM2NqaTF3ZXl4dw%3D%3D&utm_source=qr)にてお知らせいたします。
+        `,
+        url: './news/article.html?id=2026年度tetra始動'
+    },
+    {
         id: 'greeting-2026',
         date: '2026.01.01',
         label: 'Greeting',
@@ -8,9 +23,11 @@ const newsItems = [
         publishAt: '2025-12-31T00:00:00+09:00',
         content: `
 
+
 ## 新年、あけましておめでとうございます。
 
 2026年も、新しい景色を求めて。
+        
         
         `,
         url: './greeting_newyear_2026.html'
@@ -24,6 +41,7 @@ const newsItems = [
         publishAt: '2025-12-31T00:00:00+09:00',
         content: `
 
+
 ## Webサイトをリニューアルしました
 
 Tetraの公式Webサイトが新しくなりました！
@@ -34,6 +52,7 @@ Tetraの公式Webサイトが新しくなりました！
 3. **モバイル対応**: スマートフォンでも快適に見られるように最適化しました。
 
 今後ともTetraをよろしくお願いいたします。
+        
         
         `,
         url: './news/article.html?id=website-renewal'
@@ -46,6 +65,7 @@ Tetraの公式Webサイトが新しくなりました！
         title: "サークル長からのご挨拶",
         publishAt: '2025-12-31T00:00:00+09:00',
         content: `
+
 
 ## ご挨拶
 
@@ -61,6 +81,7 @@ Tetraの公式Webサイトが新しくなりました！
 
 興味のある方は、ぜひ一度見学にいらしてください！
         
+        
         `,
         url: './news/article.html?id=message-from-leader'
     },
@@ -73,12 +94,14 @@ Tetraの公式Webサイトが新しくなりました！
         publishAt: '2024-09-20T00:00:00+09:00',
         content: `
 
+
 ## 新サークル『Tetra』始動
 
 本日、新しいサークル『Tetra』が活動を開始しました。
 
 ### Tetraとは？
 Tetraは、明治学院大学情報数理学部の学生4名で設立したサークルです。
+        
         `,
         url: './news/article.html?id=tetra-launch'
     }
