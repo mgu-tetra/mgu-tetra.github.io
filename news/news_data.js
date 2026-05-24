@@ -1,5 +1,22 @@
 const newsItems = [
     {
+        id: '戸塚まつり',
+        date: '2026.05.24',
+        label: 'Info',
+        type: 'info',
+        title: "戸塚まつり",
+        publishAt: '2026-05-24T00:00:00+09:00',
+        content: `
+Tetraは戸塚まつりに参加します！
+みなさんぜひ来てください！
+
+場所：明治学院大学横浜キャンパス
+日時：5月24日(日)
+時間：09:00 ~ 16:00
+        `,
+        url: './news/article.html?id=戸塚まつり'
+    },
+    {
         id: '2026年度tetra始動',
         date: '2026.04.02',
         label: 'Info',
