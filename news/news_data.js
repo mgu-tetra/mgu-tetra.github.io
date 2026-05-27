@@ -5,7 +5,7 @@ const newsItems = [
         label: 'Info',
         type: 'info',
         title: "戸塚まつりの MagiCode が遊べる！",
-        publishAt: '2026-05-27T00:00:00+09:00',
+        publishAt: '2026-05-28T00:00:00+09:00',
         content: `
 Tetraが戸塚まつりで実施した「名探偵テトラ」はのべ460人を超える方に来場していただきました。ありがとうございます。
 
