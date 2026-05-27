@@ -759,14 +759,21 @@ footer {
 }
 
 .work-card {
+    display: block;
     background-color: var(--card-bg);
     border-radius: var(--radius-l);
     overflow: hidden;
     transition: transform 0.3s;
+    cursor: pointer;
 }
 
 .work-card:active {
     transform: scale(0.97);
+}
+
+.work-card:focus {
+    outline: 3px solid var(--accent-color);
+    outline-offset: 6px;
 }
 
 .work-image {

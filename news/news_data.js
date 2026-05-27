@@ -7,13 +7,15 @@ const newsItems = [
         title: "戸塚まつりの MagiCode が遊べる！",
         publishAt: '2026-05-27T00:00:00+09:00',
         content: `
-Tetraが戸塚まつりで実施した「名探偵テトラ」はのべ460人を超える方に来場していただきました。ありがとうございます
+Tetraが戸塚まつりで実施した「名探偵テトラ」はのべ460人を超える方に来場していただきました。ありがとうございます。
 
-そんな名探偵テトラの脱出ゲームで最終問題になっていた"MagiCode"がTetraのWebサイトから遊べるようになりました！
+そんな名探偵テトラの脱出ゲームで最終問題になっていた MagiCode がTetraのWebサイトから遊べるようになりました！
 
-詳しくはこのページ上の"Programming"をチェック！
+下のリンクから遊べるのでぜひ楽しんでくださいね！
+
+[ゲームで遊ぶ！](../programming/game/magicode.html)
         `,
-        url: './news/article.html?id=戸塚まつり'
+        url: './news/article.html?id=MagiCode'
     },
     {
         id: '戸塚まつり',
@@ -30,7 +32,7 @@ Tetraは戸塚まつりに参加します！
 日時：5月24日(日)
 時間：09:00 ~ 16:00
         `,
-        url: './news/article.html?id=MagiCode'
+        url: './news/article.html?id=戸塚まつり'
     },
     {
         id: '2026年度tetra始動',
