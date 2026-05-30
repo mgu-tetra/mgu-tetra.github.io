@@ -1,0 +1,20 @@
+<header>
+    <div class="header-inner">
+        <a href="<%= rootPath %>index.html" class="logo-box">
+            <img src="<%= rootPath %>images/official_logo_sq_ske_white.png" alt="Tetra">
+        </a>
+
+        <!-- Mobile Hamburger Button -->
+        <button class="hamburger-btn" aria-label="Menu">
+            <div class="bar"></div>
+            <div class="bar"></div>
+        </button>
+
+        <!-- Desktop Navigation (Hidden on Mobile) -->
+        <nav class="desktop-nav">
+            <a href="<%= rootPath %>news/news.html" class="nav-link<%= current === 'news' ? ' current' : '' %>">News</a>
+            <a href="<%= rootPath %>programming/programming.html" class="nav-link<%= current === 'programming' ? ' current' : '' %>">Programming</a>
+            <a href="<%= rootPath %>graphics/graphics.html" class="nav-link<%= current === 'graphics' ? ' current' : '' %>">Graphics</a>
+        </nav>
+    </div>
+</header>
