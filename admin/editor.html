@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="noindex, nofollow">
     <title>News Editor | Tetra Admin</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1167,7 +1168,7 @@
                     </div>
                     <input type="password" id="pat-input" placeholder="github_pat_xxxx...">
                     <label class="auth-remember">
-                        <input type="checkbox" id="remember-pat" checked>
+                        <input type="checkbox" id="remember-pat">
                         Remember token in this browser (localStorage)
                     </label>
                 </div>
@@ -1180,25 +1181,7 @@
         </div>
     </div>
 
-    <!-- Export Modal -->
-    <div class="modal-backdrop" id="export-modal">
-        <div class="modal">
-            <div class="modal-header">
-                <h2>Export news_data.js</h2>
-                <button class="btn btn-sm" onclick="closeExportModal()">Close</button>
-            </div>
-            <div class="modal-body">
-                <p style="margin-bottom: 12px; color: var(--text-secondary); font-size: 14px;">
-                    Copy the content below and replace <code>news/news_data.js</code> in your repository.
-                </p>
-                <pre id="export-content"></pre>
-            </div>
-            <div class="modal-footer">
-                <button class="btn" onclick="closeExportModal()">Close</button>
-                <button class="btn btn-primary" onclick="copyExport()">Copy to Clipboard</button>
-            </div>
-        </div>
-    </div>
+    
 
     <!-- Image Upload Modal -->
     <div class="modal-backdrop" id="image-upload-modal">
@@ -1241,7 +1224,7 @@
     <div class="toast" id="toast"></div>
 
     <!-- Load existing data -->
-    <script src="../news/news_data.js"></script>
+    
 
     <script>
         // ══════════════════════════════════════
@@ -1249,7 +1232,7 @@
         // ══════════════════════════════════════
         const GITHUB_OWNER = 'mgu-tetra';
         const GITHUB_REPO = 'mgu-tetra.github.io';
-        const FILE_PATH = 'news/news_data.js';
+        const FILE_PATH = 'news/news_index.json';
         const BRANCH = 'main';
         const STORAGE_KEY_PAT = 'tetra_github_pat';
         const STORAGE_KEY_USER = 'tetra_github_user';
@@ -1271,10 +1254,13 @@
         // ══════════════════════════════════════
         // Init
         // ══════════════════════════════════════
-        function init() {
-            if (typeof newsItems !== 'undefined') {
-                articles = JSON.parse(JSON.stringify(newsItems));
-            }
+        async function init() {
+            try {
+                const res = await fetch('../news/news_index.json?t=' + Date.now());
+                if (res.ok) {
+                    articles = await res.json();
+                }
+            } catch(e) { console.error(e); }
             renderArticleList();
             restoreAuth();
 
@@ -1456,7 +1442,6 @@
                 return;
             }
 
-            // Auto-save current article first
             if (currentArticleId) {
                 const saved = saveArticleSilent();
                 if (!saved) return;
@@ -1470,7 +1455,6 @@
             publishBtn.disabled = true;
             publishBtn.textContent = 'Publishing...';
             statusEl.style.display = 'flex';
-            statusText.textContent = 'Fetching current file...';
 
             try {
                 const token = getToken();
@@ -1479,54 +1463,42 @@
                     'Accept': 'application/vnd.github+json'
                 };
 
-                // 1. Get current file SHA (required for update)
-                statusText.textContent = 'Fetching current file SHA...';
-                const getRes = await fetch(
-                    `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${FILE_PATH}?ref=${BRANCH}`,
-                    { headers }
-                );
+                async function putFile(path, contentStr, commitMessage) {
+                    let sha = null;
+                    const getRes = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}?ref=${BRANCH}`, { headers });
+                    if (getRes.ok) {
+                        const fileData = await getRes.json();
+                        sha = fileData.sha;
+                    }
+                    const encoded = btoa(unescape(encodeURIComponent(contentStr)));
+                    const putBody = { message: commitMessage, content: encoded, branch: BRANCH };
+                    if (sha) putBody.sha = sha;
 
-                if (getRes.ok) {
-                    const fileData = await getRes.json();
-                    fileSha = fileData.sha;
-                } else if (getRes.status === 404) {
-                    fileSha = null; // File doesn't exist yet, will create
-                } else {
-                    const err = await getRes.json();
-                    throw new Error(err.message || `HTTP ${getRes.status}`);
-                }
-
-                // 2. Generate content and encode to base64
-                statusText.textContent = 'Uploading...';
-                const content = generateNewsDataJS();
-                const encoded = btoa(unescape(encodeURIComponent(content)));
-
-                // 3. PUT to update/create the file
-                const putBody = {
-                    message: `Update news articles via editor`,
-                    content: encoded,
-                    branch: BRANCH
-                };
-                if (fileSha) {
-                    putBody.sha = fileSha;
-                }
-
-                const putRes = await fetch(
-                    `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${FILE_PATH}`,
-                    {
+                    const putRes = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}`, {
                         method: 'PUT',
                         headers: { ...headers, 'Content-Type': 'application/json' },
                         body: JSON.stringify(putBody)
+                    });
+                    if (!putRes.ok) {
+                        const err = await putRes.json();
+                        throw new Error(err.message || `HTTP ${putRes.status}`);
                     }
-                );
-
-                if (!putRes.ok) {
-                    const err = await putRes.json();
-                    throw new Error(err.message || `HTTP ${putRes.status}`);
+                    return await putRes.json();
                 }
 
-                const result = await putRes.json();
-                fileSha = result.content.sha;
+                statusText.textContent = 'Publishing index...';
+                const indexJsonStr = JSON.stringify(articles.map(a => {
+                    const copy = { ...a };
+                    delete copy.content;
+                    return copy;
+                }), null, 2);
+                await putFile(FILE_PATH, indexJsonStr, 'Update news_index.json via editor');
+
+                if (currentArticleId) {
+                    statusText.textContent = 'Publishing article...';
+                    const contentMarkdown = document.getElementById('field-content').value;
+                    await putFile(`news/articles/${currentArticleId}.md`, contentMarkdown, `Update article ${currentArticleId} via editor`);
+                }
 
                 statusEl.style.display = 'none';
                 isDirty = false;
@@ -1563,17 +1535,13 @@
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
                 const data = await res.json();
-                fileSha = data.sha;
+                const decoded = decodeURIComponent(escape(atob(data.content.replace(/
+/g, ''))));
+                
+                // Safe JSON parsing
+                const items = JSON.parse(decoded);
 
-                // Decode base64 content
-                const decoded = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ''))));
-
-                // Parse newsItems from the JS file content
-                // Execute in a sandboxed way
-                const fn = new Function(decoded + '\nreturn newsItems;');
-                const items = fn();
-
-                articles = JSON.parse(JSON.stringify(items));
+                articles = items;
                 currentArticleId = null;
                 document.getElementById('editor-form').style.display = 'none';
                 document.getElementById('editor-empty').style.display = 'flex';
@@ -1641,7 +1609,7 @@
         // ══════════════════════════════════════
         // Article Selection
         // ══════════════════════════════════════
-        function selectArticle(id) {
+        async function selectArticle(id) {
             currentArticleId = id;
             const article = articles.find(a => a.id === id);
             if (!article) return;
@@ -1656,7 +1624,25 @@
             document.getElementById('field-title').value = article.title || '';
             document.getElementById('field-type').value = article.type || 'info';
             document.getElementById('field-label').value = article.label || '';
-            document.getElementById('field-content').value = (article.content || '').trim();
+            
+            document.getElementById('field-content').value = 'Loading...';
+            try {
+                if (article.id.startsWith('new-article-') || article.id.startsWith('copy-')) {
+                    document.getElementById('field-content').value = article.content || '';
+                } else {
+                    const res = await fetch(`../news/articles/${id}.md?t=${Date.now()}`);
+                    if (res.ok) {
+                        const text = await res.text();
+                        document.getElementById('field-content').value = text;
+                        // Store it temporarily in article object so draft save works seamlessly
+                        article.content = text;
+                    } else {
+                        document.getElementById('field-content').value = article.content || '';
+                    }
+                }
+            } catch(e) {
+                document.getElementById('field-content').value = article.content || '';
+            }
 
             // Publish At
             if (article.publishAt) {
@@ -1895,61 +1881,6 @@
         function updateUrlType() {
             const val = document.querySelector('input[name="url-type"]:checked').value;
             document.getElementById('custom-url-group').style.display = val === 'custom' ? '' : 'none';
-        }
-
-        // ══════════════════════════════════════
-        // Export / Download (fallback)
-        // ══════════════════════════════════════
-        function generateNewsDataJS() {
-            const items = articles.map(item => {
-                const contentStr = item.content ? item.content.replace(/`/g, '\\`').replace(/\$\{/g, '\\${') : '';
-                const lines = [
-                    `    {`,
-                    `        id: '${escapeSingleQuote(item.id)}',`,
-                    `        date: '${escapeSingleQuote(item.date)}',`,
-                    `        label: '${escapeSingleQuote(item.label)}',`,
-                    `        type: '${escapeSingleQuote(item.type)}',`,
-                    `        title: ${JSON.stringify(item.title)},`,
-                    `        publishAt: '${escapeSingleQuote(item.publishAt)}',`,
-                    `        content: \`\n${contentStr}\n        \`,`,
-                    `        url: '${escapeSingleQuote(item.url)}'`,
-                    `    }`
-                ];
-                return lines.join('\n');
-            });
-
-            return `const newsItems = [\n${items.join(',\n')}\n];\n`;
-        }
-
-        function exportNewsData() {
-            const content = generateNewsDataJS();
-            document.getElementById('export-content').textContent = content;
-            document.getElementById('export-modal').classList.add('active');
-        }
-
-        function closeExportModal() {
-            document.getElementById('export-modal').classList.remove('active');
-        }
-
-        function copyExport() {
-            const content = generateNewsDataJS();
-            navigator.clipboard.writeText(content).then(() => {
-                showToast('Copied to clipboard', 'success');
-            }).catch(() => {
-                showToast('Failed to copy', 'error');
-            });
-        }
-
-        function downloadNewsData() {
-            const content = generateNewsDataJS();
-            const blob = new Blob([content], { type: 'application/javascript' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'news_data.js';
-            a.click();
-            URL.revokeObjectURL(url);
-            showToast('Download started', 'success');
         }
 
         // ══════════════════════════════════════

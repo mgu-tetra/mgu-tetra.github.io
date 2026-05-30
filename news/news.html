@@ -56,13 +56,17 @@
         </div>
     </main>
 
-    <script src="./news_data.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             const list = document.getElementById('news-archive-list');
             if (!list) return;
 
-            const sortedNews = newsItems.sort((a, b) => new Date(b.date) - new Date(a.date));
+            try {
+                const res = await fetch('./news_index.json');
+                if (!res.ok) throw new Error('Failed to fetch news index');
+                const newsItems = await res.json();
+
+                const sortedNews = newsItems.sort((a, b) => new Date(b.date) - new Date(a.date));
             const now = new Date();
 
             sortedNews.forEach(item => {
@@ -99,6 +103,9 @@
                     `;
                 list.appendChild(li);
             });
+            } catch (error) {
+                console.error('Failed to load news archive:', error);
+            }
         });
     </script>
     </section>

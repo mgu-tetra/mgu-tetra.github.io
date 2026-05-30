@@ -1,0 +1,65 @@
+[
+  {
+    "id": "MagiCode",
+    "date": "2026.05.28",
+    "label": "Info",
+    "type": "info",
+    "title": "戸塚まつりの MagiCode が遊べる！",
+    "publishAt": "2026-05-28T00:00:00+09:00",
+    "url": "./news/article.html?id=MagiCode"
+  },
+  {
+    "id": "戸塚まつり",
+    "date": "2026.05.24",
+    "label": "Info",
+    "type": "info",
+    "title": "戸塚まつり",
+    "publishAt": "2026-05-24T00:00:00+09:00",
+    "url": "./news/article.html?id=戸塚まつり"
+  },
+  {
+    "id": "2026年度tetra始動",
+    "date": "2026.04.02",
+    "label": "Info",
+    "type": "info",
+    "title": "2026年度Tetra始動",
+    "publishAt": "2026-04-02T01:00:00+09:00",
+    "url": "./news/article.html?id=2026年度tetra始動"
+  },
+  {
+    "id": "greeting-2026",
+    "date": "2026.01.01",
+    "label": "Greeting",
+    "type": "event",
+    "title": "2026年 新年のご挨拶",
+    "publishAt": "2025-12-31T00:00:00+09:00",
+    "url": "./greeting_newyear_2026.html"
+  },
+  {
+    "id": "website-renewal",
+    "date": "2025.12.31",
+    "label": "Notice",
+    "type": "notice",
+    "title": "Webサイトリニューアルのお知らせ",
+    "publishAt": "2025-12-31T00:00:00+09:00",
+    "url": "./news/article.html?id=website-renewal"
+  },
+  {
+    "id": "message-from-leader",
+    "date": "2025.12.31",
+    "label": "Info",
+    "type": "info",
+    "title": "サークル長からのご挨拶",
+    "publishAt": "2025-12-31T00:00:00+09:00",
+    "url": "./news/article.html?id=message-from-leader"
+  },
+  {
+    "id": "tetra-launch",
+    "date": "2024.09.20",
+    "label": "Event",
+    "type": "event",
+    "title": "新サークル『Tetra』活動開始",
+    "publishAt": "2024-09-20T00:00:00+09:00",
+    "url": "./news/article.html?id=tetra-launch"
+  }
+]
