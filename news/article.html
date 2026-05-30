@@ -295,11 +295,8 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
 
-    <!-- Load Data -->
-    <script src="./news_data.js"></script>
-
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             // 1. Get ID from URL
             const urlParams = new URLSearchParams(window.location.search);
             const articleId = urlParams.get('id');
@@ -310,32 +307,44 @@
                 return;
             }
 
-            // 2. Find article in newsItems (from news_data.js)
-            const article = newsItems.find(item => item.id === articleId);
+            try {
+                // 2. Fetch index for metadata
+                const indexRes = await fetch('./news_index.json');
+                if (!indexRes.ok) throw new Error('Failed to fetch news index');
+                const newsItems = await indexRes.json();
+                
+                const article = newsItems.find(item => item.id === articleId);
 
-            if (!article) {
-                document.getElementById('article-title').textContent = 'Article Not Found';
-                document.getElementById('article-body').textContent = 'The requested article does not exist.';
-                return;
-            }
+                if (!article) {
+                    document.getElementById('article-title').textContent = 'Article Not Found';
+                    document.getElementById('article-body').textContent = 'The requested article does not exist.';
+                    return;
+                }
 
-            // 3. Render content
-            document.title = `${article.title} | Tetra News`;
+                // 3. Render metadata
+                document.title = `${article.title} | Tetra News`;
 
-            document.getElementById('article-title').textContent = article.title;
-            document.getElementById('article-date').textContent = article.date;
+                document.getElementById('article-title').textContent = article.title;
+                document.getElementById('article-date').textContent = article.date;
 
-            const labelEl = document.getElementById('article-label');
-            labelEl.textContent = article.label;
-            labelEl.className = `article-label ${article.type}`;
+                const labelEl = document.getElementById('article-label');
+                labelEl.textContent = article.label;
+                labelEl.className = `article-label ${article.type}`;
 
-            // Convert Markdown to HTML and Sanitize
-            if (article.content) {
-                const rawHtml = marked.parse(article.content);
-                const safeHtml = DOMPurify.sanitize(rawHtml);
-                document.getElementById('article-body').innerHTML = safeHtml;
-            } else {
-                document.getElementById('article-body').textContent = 'No content available.';
+                // 4. Fetch markdown content
+                const contentRes = await fetch(`./articles/${articleId}.md`);
+                if (contentRes.ok) {
+                    const markdownText = await contentRes.text();
+                    const rawHtml = marked.parse(markdownText);
+                    const safeHtml = DOMPurify.sanitize(rawHtml);
+                    document.getElementById('article-body').innerHTML = safeHtml;
+                } else {
+                    document.getElementById('article-body').textContent = 'No content available.';
+                }
+            } catch (error) {
+                console.error(error);
+                document.getElementById('article-title').textContent = 'Error';
+                document.getElementById('article-body').textContent = 'Failed to load the article.';
             }
         });
     </script>

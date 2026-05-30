@@ -54,14 +54,18 @@
             </div>
         </div>
 
-        <script src="./news/news_data.js"></script>
         <script>
-            document.addEventListener('DOMContentLoaded', () => {
+            document.addEventListener('DOMContentLoaded', async () => {
                 const tickerList = document.getElementById('ticker-list');
                 if (!tickerList) return;
 
-                // Sort by date desc
-                const sortedNews = newsItems.sort((a, b) => new Date(b.date) - new Date(a.date));
+                try {
+                    const res = await fetch('./news/news_index.json');
+                    if (!res.ok) throw new Error('Failed to fetch news index');
+                    const newsItems = await res.json();
+
+                    // Sort by date desc
+                    const sortedNews = newsItems.sort((a, b) => new Date(b.date) - new Date(a.date));
                 const now = new Date();
 
                 sortedNews.forEach(item => {
@@ -88,6 +92,9 @@
                     `;
                     tickerList.appendChild(li);
                 });
+                } catch (error) {
+                    console.error('Failed to initialize news ticker:', error);
+                }
             });
         </script>
         </div>
