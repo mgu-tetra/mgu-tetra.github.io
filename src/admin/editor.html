@@ -1232,7 +1232,7 @@
         // ══════════════════════════════════════
         const GITHUB_OWNER = 'mgu-tetra';
         const GITHUB_REPO = 'mgu-tetra.github.io';
-        const FILE_PATH = 'news/news_index.json';
+        const FILE_PATH = 'public/news/news_index.json';
         const BRANCH = 'main';
         const STORAGE_KEY_PAT = 'tetra_github_pat';
         const STORAGE_KEY_USER = 'tetra_github_user';
@@ -1250,6 +1250,7 @@
         let autoSaveTimer = null;
         let searchQuery = '';
         let uploadFileData = null; // { base64, name, size }
+        let uploadedImagesCache = {}; // Phase 2: { 'filename.jpg': 'blobUrl' }
 
         // ══════════════════════════════════════
         // Init
@@ -1497,7 +1498,7 @@
                 if (currentArticleId) {
                     statusText.textContent = 'Publishing article...';
                     const contentMarkdown = document.getElementById('field-content').value;
-                    await putFile(`news/articles/${currentArticleId}.md`, contentMarkdown, `Update article ${currentArticleId} via editor`);
+                    await putFile(`public/news/articles/${currentArticleId}.md`, contentMarkdown, `Update article ${currentArticleId} via editor`);
                 }
 
                 statusEl.style.display = 'none';
@@ -1723,10 +1724,10 @@
             const idField = document.getElementById('field-id');
             if (idField.value.startsWith('new-article-') && titleVal) {
                 const slug = titleVal.toLowerCase()
-                    .replace(/[\u3040-\u30FF\u4E00-\u9FFF]+/g, (m) => m) // keep Japanese as-is
                     .replace(/\s+/g, '-')
-                    .replace(/[^a-z0-9\-\u3040-\u30FF\u4E00-\u9FFF]/g, '')
+                    .replace(/[^a-z0-9\-]/g, '')
                     .replace(/-+/g, '-')
+                    .replace(/^-|-$/g, '')
                     .slice(0, 60);
                 if (slug) idField.value = slug;
             }
@@ -1736,6 +1737,13 @@
             // Validate ID
             if (!newId) {
                 if (!silent) setFieldError('field-id', null);
+                return null;
+            }
+            if (!/^[a-z0-9\-]+$/.test(newId)) {
+                if (!silent) {
+                    setFieldError('field-id', null);
+                    showToast('ID (slug) must contain only lowercase letters, numbers, and hyphens (a-z0-9-).', 'error');
+                }
                 return null;
             }
             clearFieldError('field-id', null);
@@ -1871,6 +1879,18 @@
                 if (toolbar) toolbar.style.display = 'none';
                 const raw = marked.parse(document.getElementById('field-content').value);
                 preview.innerHTML = DOMPurify.sanitize(raw);
+
+                // Phase 2: Resolve locally uploaded images to Blob URLs in the editor preview
+                const images = preview.querySelectorAll('img');
+                images.forEach(img => {
+                    const src = img.getAttribute('src');
+                    if (src && src.startsWith('../images/')) {
+                        const filename = src.substring('../images/'.length);
+                        if (uploadedImagesCache[filename]) {
+                            img.src = uploadedImagesCache[filename];
+                        }
+                    }
+                });
             }
         }
 
@@ -2217,7 +2237,8 @@
                 return;
             }
 
-            const imagePath = `images/${filename}`;
+            // Phase 1: 保存先を public/images/ に変更
+            const imagePath = `public/images/${filename}`;
             const token = getToken();
             const headers = {
                 'Authorization': `Bearer ${token}`,
@@ -2266,9 +2287,8 @@
                     throw new Error(err.message || `HTTP ${putRes.status}`);
                 }
 
-                // Insert markdown into textarea
-                const rawUrl = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main/${imagePath}`;
-                const mdSnippet = `![${filename}](${rawUrl})`;
+                // Phase 1: 挿入するマークダウンスニペットを相対パス化
+                const mdSnippet = `![${filename}](../images/${filename})`;
                 const textarea = document.getElementById('field-content');
                 if (textarea) {
                     const pos = textarea.selectionStart;
@@ -2276,6 +2296,13 @@
                     const after = textarea.value.substring(pos);
                     textarea.value = before + '\n' + mdSnippet + '\n' + after;
                     textarea.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+
+                // Phase 2: メモリ内キャッシュへ Blob URL を登録
+                const fileInput = document.getElementById('upload-file-input');
+                if (fileInput && fileInput.files && fileInput.files[0]) {
+                    const file = fileInput.files[0];
+                    uploadedImagesCache[filename] = URL.createObjectURL(file);
                 }
 
                 closeImageUploadModal();

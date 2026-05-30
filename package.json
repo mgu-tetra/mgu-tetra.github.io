@@ -1,0 +1,14 @@
+{
+  "name": "mgu-tetra-website",
+  "version": "1.0.0",
+  "description": "Home Page for Tetra at Meiji Gakuin University",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^5.2.11",
+    "vite-plugin-ejs": "^1.7.0"
+  }
+}

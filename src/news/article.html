@@ -212,25 +212,7 @@
 
 <body>
 
-    <header>
-        <div class="header-inner">
-            <a href="../index.html" class="logo-box">
-                <img src="../images/official_logo_sq_ske_white.png" alt="Tetra">
-            </a>
-
-            <!-- Mobile Hamburger Button -->
-            <button class="hamburger-btn" aria-label="Menu">
-                <div class="bar"></div>
-                <div class="bar"></div>
-            </button>
-
-            <nav class="desktop-nav">
-                <a href="news.html" class="nav-link current">News</a>
-                <a href="../programming/programming.html" class="nav-link">Programming</a>
-                <a href="../graphics/graphics.html" class="nav-link">Graphics</a>
-            </nav>
-        </div>
-    </header>
+    <%- include('components/header.ejs', { rootPath: '../', current: 'news' }) %>
 
     <main>
         <div class="back-link-wrapper">
@@ -261,34 +243,9 @@
 
     <!-- Mobile Bottom Navigation -->
     <!-- Mobile Navigation Overlay -->
-    <div class="mobile-nav-overlay">
-        <div class="mobile-nav-content">
-            <nav class="mobile-nav-links">
-                <a href="../index.html" class="mobile-link">Home</a>
-                <a href="news.html" class="mobile-link">News</a>
-                <a href="../programming/programming.html" class="mobile-link">Programming</a>
-                <a href="../graphics/graphics.html" class="mobile-link">Graphics</a>
-            </nav>
-            <div class="mobile-socials">
-                <a href="https://www.instagram.com/tetra.00000100/"><img src="../images/Instagram_Glyph_White.png"
-                        alt="Instagram"></a>
-                <a href="https://x.com/Tetra00000100"><img src="../images/x_logo-white.png" alt="X"></a>
-                <a href="https://www.youtube.com/@Tetra.0100"><img src="../images/youtube_social_square_dark.png"
-                        alt="YouTube" style="filter: invert(1);"></a>
-            </div>
-        </div>
-    </div>
+    <%- include('components/mobile-nav.ejs', { rootPath: '../' }) %>
 
-    <footer>
-        <div class="social-links">
-            <a href="https://www.instagram.com/tetra.00000100/"><img src="../images/Instagram_Glyph_White.png"
-                    alt="Instagram"></a>
-            <a href="https://x.com/Tetra00000100"><img src="../images/x_logo-white.png" alt="X"></a>
-            <a href="https://www.youtube.com/@Tetra.0100"><img src="../images/youtube_social_square_dark.png"
-                    alt="YouTube" style="filter: invert(1);"></a>
-        </div>
-        <p class="copyright">&copy; Tetra Meiji Gakuin Univ.</p>
-    </footer>
+    <%- include('components/footer.ejs', { rootPath: '../' }) %>
 
     <!-- Scripts -->
     <!-- Load Markdown & Sanitizer libraries -->
@@ -309,7 +266,7 @@
 
             try {
                 // 2. Fetch index for metadata
-                const indexRes = await fetch('./news_index.json');
+                const indexRes = await fetch('./news_index.json?t=' + Date.now());
                 if (!indexRes.ok) throw new Error('Failed to fetch news index');
                 const newsItems = await indexRes.json();
                 
@@ -332,7 +289,7 @@
                 labelEl.className = `article-label ${article.type}`;
 
                 // 4. Fetch markdown content
-                const contentRes = await fetch(`./articles/${articleId}.md`);
+                const contentRes = await fetch(`./articles/${articleId}.md?t=${Date.now()}`);
                 if (contentRes.ok) {
                     const markdownText = await contentRes.text();
                     const rawHtml = marked.parse(markdownText);
@@ -349,7 +306,7 @@
         });
     </script>
 
-    <script src="../script/script.js"></script>
+    <script src="../script/script.js" type="module"></script>
 </body>
 
 </html>
