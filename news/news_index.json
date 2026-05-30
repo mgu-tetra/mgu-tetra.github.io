@@ -1,14 +1,5 @@
 [
   {
-    "id": "テスト配信です",
-    "date": "2026.05.30",
-    "label": "Info",
-    "type": "info",
-    "title": "テスト配信です",
-    "publishAt": "2026-05-29T15:00:00+09:00",
-    "url": "./news/article.html?id=テスト配信です"
-  },
-  {
     "id": "MagiCode",
     "date": "2026.05.28",
     "label": "Info",
