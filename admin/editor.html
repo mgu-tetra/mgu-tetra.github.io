@@ -1535,8 +1535,7 @@
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
                 const data = await res.json();
-                const decoded = decodeURIComponent(escape(atob(data.content.replace(/
-/g, ''))));
+                const decoded = decodeURIComponent(escape(atob(data.content.replace(/\\n/g, ''))));
                 
                 // Safe JSON parsing
                 const items = JSON.parse(decoded);
