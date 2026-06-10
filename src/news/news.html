@@ -12,70 +12,65 @@
         href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap"
         rel="stylesheet">
 
-    <link rel="stylesheet" href="../style/style.css">
+    <link rel="stylesheet" href="/src/style/style.css">
 </head>
 
 <body>
 
-    <%- include('components/header.ejs', { rootPath: '../', current: 'news' }) %>
+    <%- include('components/header.ejs', { current: 'news' }) %>
 
-    <main>
-        <div class="container">
-            <section class="page-hero">
-                <h1 class="page-title">News</h1>
-                <p class="page-desc">
-                    活動報告、イベント情報、Tetraからのお知らせ。<br>
-                    最新の情報をチェックしてください。
-                </p>
-            </section>
+        <main>
+            <div class="container">
+                <section class="page-hero">
+                    <h1 class="page-title">News</h1>
+                    <p class="page-desc">
+                        活動報告、イベント情報、Tetraからのお知らせ。<br>
+                        最新の情報をチェックしてください。
+                    </p>
+                </section>
 
-            <section class="news-archive-section">
-                <!-- News List -->
-                <ul class="news-archive-list" id="news-archive-list">
-                    <!-- Dynamic Content -->
-                </ul>
-            </section>
-        </div>
-    </main>
+                <section class="news-archive-section">
+                    <!-- News List -->
+                    <ul class="news-archive-list" id="news-archive-list">
+                        <!-- Dynamic Content -->
+                    </ul>
+                </section>
+            </div>
+        </main>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            const list = document.getElementById('news-archive-list');
-            if (!list) return;
+        <script>
+            document.addEventListener('DOMContentLoaded', async () => {
+                const list = document.getElementById('news-archive-list');
+                if (!list) return;
 
-            try {
-                const res = await fetch('./news_index.json?t=' + Date.now());
-                if (!res.ok) throw new Error('Failed to fetch news index');
-                const newsItems = await res.json();
+                try {
+                    const res = await fetch('/news/news_index.json?t=' + Date.now());
+                    if (!res.ok) throw new Error('Failed to fetch news index');
+                    const newsItems = await res.json();
 
-                const sortedNews = newsItems.sort((a, b) => new Date(b.date) - new Date(a.date));
-            const now = new Date();
+                    const sortedNews = newsItems.sort((a, b) => new Date(b.date) - new Date(a.date));
+                    const now = new Date();
 
-            sortedNews.forEach(item => {
-                // Check publication time
-                if (item.publishAt) {
-                    const publishDate = new Date(item.publishAt);
-                    if (now < publishDate) return; // Skip future items
-                }
+                    sortedNews.forEach(item => {
+                        // Check publication time
+                        if (item.publishAt) {
+                            const publishDate = new Date(item.publishAt);
+                            if (now < publishDate) return; // Skip future items
+                        }
 
-                const li = document.createElement('li');
-                li.className = 'news-archive-item';
+                        const li = document.createElement('li');
+                        li.className = 'news-archive-item';
 
-                // Adjust URL for subdirectory context (we are in /news/)
-                // Data comes as './news/article.html...' (optimized for Root)
-                // We need to convert it to work from here.
-                // Existing logic: prepend '.' to make it '../'
-                let adjustedUrl = item.url;
+                        // ルート相対パスを使用するため階層変換は不要です
+                        let adjustedUrl = item.url;
 
-                if (!adjustedUrl && item.id) {
-                    // If no URL but ID exists, construct local path
-                    adjustedUrl = `./article.html?id=${item.id}`;
-                } else if (adjustedUrl && adjustedUrl.startsWith('./')) {
-                    // Convert './news/...' to '../news/...'
-                    adjustedUrl = '.' + adjustedUrl;
-                }
+                        if (!adjustedUrl && item.id) {
+                            adjustedUrl = `/src/news/article.html?id=${item.id}`;
+                        } else if (adjustedUrl && adjustedUrl.startsWith('./')) {
+                            adjustedUrl = '/src/' + adjustedUrl.substring(2);
+                        }
 
-                li.innerHTML = `
+                        li.innerHTML = `
                         <a href="${adjustedUrl}" class="news-link">
                             <span class="news-date">${item.date}</span>
                             <span class="news-label ${item.type}">${item.label}</span>
@@ -83,24 +78,24 @@
                             <span class="news-arrow">→</span>
                         </a>
                     `;
-                list.appendChild(li);
+                        list.appendChild(li);
+                    });
+                } catch (error) {
+                    console.error('Failed to load news archive:', error);
+                }
             });
-            } catch (error) {
-                console.error('Failed to load news archive:', error);
-            }
-        });
-    </script>
-    </section>
-    </div>
-    </main>
+        </script>
+        </section>
+        </div>
+        </main>
 
-    <!-- Mobile Bottom Navigation -->
-    <!-- Mobile Navigation Overlay -->
-    <%- include('components/mobile-nav.ejs', { rootPath: '../' }) %>
+        <!-- Mobile Bottom Navigation -->
+        <!-- Mobile Navigation Overlay -->
+        <%- include('components/mobile-nav.ejs') %>
 
-    <%- include('components/footer.ejs', { rootPath: '../' }) %>
+            <%- include('components/footer.ejs') %>
 
-    <script src="../script/script.js" type="module"></script>
+                <script src="/src/script/script.js" type="module"></script>
 </body>
 
 </html>
