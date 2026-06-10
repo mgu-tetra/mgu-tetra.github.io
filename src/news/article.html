@@ -12,7 +12,7 @@
         href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap"
         rel="stylesheet">
 
-    <link rel="stylesheet" href="../style/style.css">
+    <link rel="stylesheet" href="/src/style/style.css">
 
     <!-- Note-like Article Styles -->
     <style>
@@ -212,101 +212,101 @@
 
 <body>
 
-    <%- include('components/header.ejs', { rootPath: '../', current: 'news' }) %>
+    <%- include('components/header.ejs', { current: 'news' }) %>
 
-    <main>
-        <div class="back-link-wrapper">
-            <a href="news.html" class="back-link">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="19" y1="12" x2="5" y2="12"></line>
-                    <polyline points="12 19 5 12 12 5"></polyline>
-                </svg>
-                Back to News
-            </a>
-        </div>
-
-        <article class="article-container">
-            <header class="article-header">
-                <h1 id="article-title" class="article-title">Loading...</h1>
-                <div class="article-meta">
-                    <span id="article-date" class="article-date"></span>
-                    <span id="article-label" class="article-label"></span>
-                </div>
-            </header>
-
-            <div id="article-body" class="article-body">
-                <!-- Markdown content will be injected here -->
+        <main>
+            <div class="back-link-wrapper">
+                <a href="news.html" class="back-link">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Back to News
+                </a>
             </div>
-        </article>
-    </main>
 
-    <!-- Mobile Bottom Navigation -->
-    <!-- Mobile Navigation Overlay -->
-    <%- include('components/mobile-nav.ejs', { rootPath: '../' }) %>
+            <article class="article-container">
+                <header class="article-header">
+                    <h1 id="article-title" class="article-title">Loading...</h1>
+                    <div class="article-meta">
+                        <span id="article-date" class="article-date"></span>
+                        <span id="article-label" class="article-label"></span>
+                    </div>
+                </header>
 
-    <%- include('components/footer.ejs', { rootPath: '../' }) %>
+                <div id="article-body" class="article-body">
+                    <!-- Markdown content will be injected here -->
+                </div>
+            </article>
+        </main>
 
-    <!-- Scripts -->
-    <!-- Load Markdown & Sanitizer libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+        <!-- Mobile Bottom Navigation -->
+        <!-- Mobile Navigation Overlay -->
+        <%- include('components/mobile-nav.ejs') %>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            // 1. Get ID from URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const articleId = urlParams.get('id');
+            <%- include('components/footer.ejs') %>
 
-            if (!articleId) {
-                document.getElementById('article-title').textContent = 'Article Not Found';
-                document.getElementById('article-body').textContent = 'No article ID specified.';
-                return;
-            }
+                <!-- Scripts -->
+                <!-- Load Markdown & Sanitizer libraries -->
+                <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
 
-            try {
-                // 2. Fetch index for metadata
-                const indexRes = await fetch('./news_index.json?t=' + Date.now());
-                if (!indexRes.ok) throw new Error('Failed to fetch news index');
-                const newsItems = await indexRes.json();
-                
-                const article = newsItems.find(item => item.id === articleId);
+                <script>
+                    document.addEventListener('DOMContentLoaded', async () => {
+                        // 1. Get ID from URL
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const articleId = urlParams.get('id');
 
-                if (!article) {
-                    document.getElementById('article-title').textContent = 'Article Not Found';
-                    document.getElementById('article-body').textContent = 'The requested article does not exist.';
-                    return;
-                }
+                        if (!articleId) {
+                            document.getElementById('article-title').textContent = 'Article Not Found';
+                            document.getElementById('article-body').textContent = 'No article ID specified.';
+                            return;
+                        }
 
-                // 3. Render metadata
-                document.title = `${article.title} | Tetra News`;
+                        try {
+                            // 2. Fetch index for metadata
+                            const indexRes = await fetch('/news/news_index.json?t=' + Date.now());
+                            if (!indexRes.ok) throw new Error('Failed to fetch news index');
+                            const newsItems = await indexRes.json();
 
-                document.getElementById('article-title').textContent = article.title;
-                document.getElementById('article-date').textContent = article.date;
+                            const article = newsItems.find(item => item.id === articleId);
 
-                const labelEl = document.getElementById('article-label');
-                labelEl.textContent = article.label;
-                labelEl.className = `article-label ${article.type}`;
+                            if (!article) {
+                                document.getElementById('article-title').textContent = 'Article Not Found';
+                                document.getElementById('article-body').textContent = 'The requested article does not exist.';
+                                return;
+                            }
 
-                // 4. Fetch markdown content
-                const contentRes = await fetch(`./articles/${articleId}.md?t=${Date.now()}`);
-                if (contentRes.ok) {
-                    const markdownText = await contentRes.text();
-                    const rawHtml = marked.parse(markdownText);
-                    const safeHtml = DOMPurify.sanitize(rawHtml);
-                    document.getElementById('article-body').innerHTML = safeHtml;
-                } else {
-                    document.getElementById('article-body').textContent = 'No content available.';
-                }
-            } catch (error) {
-                console.error(error);
-                document.getElementById('article-title').textContent = 'Error';
-                document.getElementById('article-body').textContent = 'Failed to load the article.';
-            }
-        });
-    </script>
+                            // 3. Render metadata
+                            document.title = `${article.title} | Tetra News`;
 
-    <script src="../script/script.js" type="module"></script>
+                            document.getElementById('article-title').textContent = article.title;
+                            document.getElementById('article-date').textContent = article.date;
+
+                            const labelEl = document.getElementById('article-label');
+                            labelEl.textContent = article.label;
+                            labelEl.className = `article-label ${article.type}`;
+
+                            // 4. Fetch markdown content
+                            const contentRes = await fetch(`/news/articles/${articleId}.md?t=${Date.now()}`);
+                            if (contentRes.ok) {
+                                const markdownText = await contentRes.text();
+                                const rawHtml = marked.parse(markdownText);
+                                const safeHtml = DOMPurify.sanitize(rawHtml);
+                                document.getElementById('article-body').innerHTML = safeHtml;
+                            } else {
+                                document.getElementById('article-body').textContent = 'No content available.';
+                            }
+                        } catch (error) {
+                            console.error(error);
+                            document.getElementById('article-title').textContent = 'Error';
+                            document.getElementById('article-body').textContent = 'Failed to load the article.';
+                        }
+                    });
+                </script>
+
+                <script src="/src/script/script.js" type="module"></script>
 </body>
 
 </html>
