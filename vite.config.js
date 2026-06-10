@@ -3,14 +3,14 @@ import { resolve } from 'path';
 import { ViteEjsPlugin } from 'vite-plugin-ejs';
 
 export default defineConfig({
-  root: 'src',
-  publicDir: '../public',
+  root: '.',
+  publicDir: './public',
   build: {
-    outDir: '../dist',
+    outDir: './dist',
     emptyOutDir: true,
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'src/index.html'),
+        main: resolve(__dirname, 'index.html'),
         news: resolve(__dirname, 'src/news/news.html'),
         article: resolve(__dirname, 'src/news/article.html'),
         programming: resolve(__dirname, 'src/programming/programming.html'),
