@@ -12,6 +12,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap"
         rel="stylesheet">
+    <link rel="icon" href="../images/official_logo_sq_ske_white.png" type="image/png">
 
     <!-- Markdown Parser -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -201,7 +202,7 @@
 
         .auth-user {
             color: var(--text-secondary);
-            max-width: 120px;
+            max-width: 200px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -652,7 +653,7 @@
             justify-content: flex-end;
         }
 
-        /* Auth Modal specific */
+        /* Auth Form */
         .auth-form {
             display: flex;
             flex-direction: column;
@@ -660,13 +661,12 @@
         }
 
         .auth-form input {
-            padding: 12px 16px;
+            padding: 10px 14px;
             border-radius: var(--radius-sm);
             border: 1px solid var(--border);
             background: var(--bg);
             color: var(--text);
             font-size: 14px;
-            font-family: var(--font-mono);
             outline: none;
         }
 
@@ -1162,14 +1162,25 @@
             <div class="modal-body">
                 <div class="auth-form">
                     <div class="auth-help">
-                        <p>Personal Access Token (Fine-grained) that has <strong>Contents: Read and write</strong> permission for <code>mgu-tetra/mgu-tetra.github.io</code>.</p>
+                        <p>Personal Access Token (Fine-grained) that has <strong>Contents: Read and write</strong> permission for your repository.</p>
                         <br>
                         <p>Generate one at <a href="https://github.com/settings/tokens?type=beta" target="_blank">GitHub Settings → Fine-grained tokens</a>.</p>
                     </div>
-                    <input type="password" id="pat-input" placeholder="github_pat_xxxx...">
+                    <div class="form-group">
+                        <label for="owner-input">GitHub Owner (User or Org)</label>
+                        <input type="text" id="owner-input" placeholder="e.g. mgu-tetra">
+                    </div>
+                    <div class="form-group">
+                        <label for="repo-input">Repository Name</label>
+                        <input type="text" id="repo-input" placeholder="e.g. tetra-hp">
+                    </div>
+                    <div class="form-group">
+                        <label for="pat-input">Personal Access Token (PAT)</label>
+                        <input type="password" id="pat-input" placeholder="github_pat_xxxx...">
+                    </div>
                     <label class="auth-remember">
                         <input type="checkbox" id="remember-pat">
-                        Remember token in this browser (localStorage)
+                        Remember token & settings in this browser (localStorage)
                     </label>
                 </div>
             </div>
@@ -1180,8 +1191,6 @@
             </div>
         </div>
     </div>
-
-    
 
     <!-- Image Upload Modal -->
     <div class="modal-backdrop" id="image-upload-modal">
@@ -1223,34 +1232,40 @@
     <!-- Toast -->
     <div class="toast" id="toast"></div>
 
-    <!-- Load existing data -->
-    
-
     <script>
         // ══════════════════════════════════════
         // Config
         // ══════════════════════════════════════
-        const GITHUB_OWNER = 'mgu-tetra';
-        const GITHUB_REPO = 'mgu-tetra.github.io';
-        const FILE_PATH = 'public/news/news_index.json';
-        const BRANCH = 'main';
         const STORAGE_KEY_PAT = 'tetra_github_pat';
         const STORAGE_KEY_USER = 'tetra_github_user';
+        const STORAGE_KEY_OWNER = 'tetra_github_owner';
+        const STORAGE_KEY_REPO = 'tetra_github_repo';
         const STORAGE_KEY_DRAFT = 'tetra_draft_articles';
         const STORAGE_KEY_LAST_PUBLISHED = 'tetra_last_published';
+
+        const FILE_PATH = 'news/news_index.json';
+        const BRANCH = 'main';
+
+        function getGithubOwner() {
+            return sessionStorage.getItem(STORAGE_KEY_OWNER) || localStorage.getItem(STORAGE_KEY_OWNER) || 'mgu-tetra';
+        }
+
+        function getGithubRepo() {
+            return sessionStorage.getItem(STORAGE_KEY_REPO) || localStorage.getItem(STORAGE_KEY_REPO) || 'tetra-hp';
+        }
 
         // ══════════════════════════════════════
         // State
         // ══════════════════════════════════════
         let articles = [];
         let currentArticleId = null;
-        let fileSha = null; // Required by GitHub API to update a file
+        let fileSha = null;
         let isPublishing = false;
         let isDirty = false;
         let autoSaveTimer = null;
         let searchQuery = '';
-        let uploadFileData = null; // { base64, name, size }
-        let uploadedImagesCache = {}; // Phase 2: { 'filename.jpg': 'blobUrl' }
+        let uploadFileData = null;
+        let uploadedImagesCache = {};
 
         // ══════════════════════════════════════
         // Init
@@ -1339,7 +1354,6 @@
                 if (res.ok) {
                     const data = await res.json();
                     const username = data.login;
-                    // Store user in same storage as token
                     if (localStorage.getItem(STORAGE_KEY_PAT) === token) {
                         localStorage.setItem(STORAGE_KEY_USER, username);
                     } else {
@@ -1347,11 +1361,7 @@
                     }
                     setAuthUI(true, username);
                 } else {
-                    localStorage.removeItem(STORAGE_KEY_PAT);
-                    localStorage.removeItem(STORAGE_KEY_USER);
-                    sessionStorage.removeItem(STORAGE_KEY_PAT);
-                    sessionStorage.removeItem(STORAGE_KEY_USER);
-                    setAuthUI(false);
+                    disconnectGitHub();
                     showToast('Token is invalid or expired', 'error');
                 }
             } catch {
@@ -1361,8 +1371,15 @@
 
         async function connectGitHub() {
             const token = document.getElementById('pat-input').value.trim();
+            const owner = document.getElementById('owner-input').value.trim();
+            const repo = document.getElementById('repo-input').value.trim();
+
             if (!token) {
                 showToast('Please enter a token', 'error');
+                return;
+            }
+            if (!owner || !repo) {
+                showToast('Please enter Owner and Repository', 'error');
                 return;
             }
 
@@ -1375,13 +1392,27 @@
                     return;
                 }
                 const data = await res.json();
+
+                // Check repository access
+                const repoRes = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!repoRes.ok) {
+                    showToast(`Cannot access repository ${owner}/${repo}`, 'error');
+                    return;
+                }
+
                 const remember = document.getElementById('remember-pat').checked;
                 if (remember) {
                     localStorage.setItem(STORAGE_KEY_PAT, token);
                     localStorage.setItem(STORAGE_KEY_USER, data.login);
+                    localStorage.setItem(STORAGE_KEY_OWNER, owner);
+                    localStorage.setItem(STORAGE_KEY_REPO, repo);
                 } else {
                     sessionStorage.setItem(STORAGE_KEY_PAT, token);
                     sessionStorage.setItem(STORAGE_KEY_USER, data.login);
+                    sessionStorage.setItem(STORAGE_KEY_OWNER, owner);
+                    sessionStorage.setItem(STORAGE_KEY_REPO, repo);
                 }
                 setAuthUI(true, data.login);
                 closeAuthModal();
@@ -1394,8 +1425,12 @@
         function disconnectGitHub() {
             localStorage.removeItem(STORAGE_KEY_PAT);
             localStorage.removeItem(STORAGE_KEY_USER);
+            localStorage.removeItem(STORAGE_KEY_OWNER);
+            localStorage.removeItem(STORAGE_KEY_REPO);
             sessionStorage.removeItem(STORAGE_KEY_PAT);
             sessionStorage.removeItem(STORAGE_KEY_USER);
+            sessionStorage.removeItem(STORAGE_KEY_OWNER);
+            sessionStorage.removeItem(STORAGE_KEY_REPO);
             fileSha = null;
             setAuthUI(false);
             closeAuthModal();
@@ -1411,7 +1446,7 @@
 
             if (connected) {
                 dot.className = 'auth-dot connected';
-                userEl.textContent = username || 'Connected';
+                userEl.textContent = `${username} (${getGithubOwner()}/${getGithubRepo()})`;
                 btn.textContent = 'GitHub';
                 publishBtn.disabled = false;
                 disconnectBtn.style.display = '';
@@ -1425,7 +1460,9 @@
         }
 
         function openAuthModal() {
-            document.getElementById('pat-input').value = '';
+            document.getElementById('pat-input').value = getToken() || '';
+            document.getElementById('owner-input').value = getGithubOwner() || '';
+            document.getElementById('repo-input').value = getGithubRepo() || '';
             document.getElementById('auth-modal').classList.add('active');
         }
 
@@ -1466,7 +1503,9 @@
 
                 async function putFile(path, contentStr, commitMessage) {
                     let sha = null;
-                    const getRes = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}?ref=${BRANCH}`, { headers });
+                    const owner = getGithubOwner();
+                    const repo = getGithubRepo();
+                    const getRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${BRANCH}`, { headers });
                     if (getRes.ok) {
                         const fileData = await getRes.json();
                         sha = fileData.sha;
@@ -1475,7 +1514,7 @@
                     const putBody = { message: commitMessage, content: encoded, branch: BRANCH };
                     if (sha) putBody.sha = sha;
 
-                    const putRes = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}`, {
+                    const putRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
                         method: 'PUT',
                         headers: { ...headers, 'Content-Type': 'application/json' },
                         body: JSON.stringify(putBody)
@@ -1498,7 +1537,7 @@
                 if (currentArticleId) {
                     statusText.textContent = 'Publishing article...';
                     const contentMarkdown = document.getElementById('field-content').value;
-                    await putFile(`public/news/articles/${currentArticleId}.md`, contentMarkdown, `Update article ${currentArticleId} via editor`);
+                    await putFile(`news/articles/${currentArticleId}.md`, contentMarkdown, `Update article ${currentArticleId} via editor`);
                 }
 
                 statusEl.style.display = 'none';
@@ -1528,8 +1567,10 @@
 
             try {
                 const token = getToken();
+                const owner = getGithubOwner();
+                const repo = getGithubRepo();
                 const res = await fetch(
-                    `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${FILE_PATH}?ref=${BRANCH}`,
+                    `https://api.github.com/repos/${owner}/${repo}/contents/${FILE_PATH}?ref=${BRANCH}`,
                     { headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' } }
                 );
 
@@ -1538,7 +1579,6 @@
                 const data = await res.json();
                 const decoded = decodeURIComponent(escape(atob(data.content.replace(/\\n/g, ''))));
                 
-                // Safe JSON parsing
                 const items = JSON.parse(decoded);
 
                 articles = items;
@@ -1593,12 +1633,13 @@
                 return `
                 <div class="article-list-item ${item.id === currentArticleId ? 'active' : ''}"
                      onclick="selectArticle('${escapeAttr(item.id)}')">
-                    <div class="item-date">${escapeHtml(item.date || '')}</div>
-                    <div class="item-title">${escapeHtml(item.title || 'Untitled')}${statusBadge}</div>
-                    <span class="item-label ${escapeAttr(item.type || '')}">${escapeHtml(item.label || item.type || '')}</span>
-                    <button class="item-duplicate-btn" onclick="duplicateArticle('${escapeAttr(item.id)}', event)" title="Duplicate">&#10697;</button>
+                     <div class="item-date">${escapeHtml(item.date || '')}</div>
+                     <div class="item-title">${escapeHtml(item.title || 'Untitled')}${statusBadge}</div>
+                     <span class="item-label ${escapeAttr(item.type || '')}">${escapeHtml(item.label || item.type || '')}</span>
+                     <button class="item-duplicate-btn" onclick="duplicateArticle('${escapeAttr(item.id)}', event)" title="Duplicate">&#10697;</button>
                 </div>
-            `}).join('');
+                `;
+            }).join('');
         }
 
         function handleSearch(value) {
@@ -1634,7 +1675,6 @@
                     if (res.ok) {
                         const text = await res.text();
                         document.getElementById('field-content').value = text;
-                        // Store it temporarily in article object so draft save works seamlessly
                         article.content = text;
                     } else {
                         document.getElementById('field-content').value = article.content || '';
@@ -1719,7 +1759,6 @@
             const idx = articles.findIndex(a => a.id === currentArticleId);
             if (idx === -1) return null;
 
-            // Auto-generate ID from title if it's still the default timestamp ID
             const titleVal = document.getElementById('field-title').value.trim();
             const idField = document.getElementById('field-id');
             if (idField.value.startsWith('new-article-') && titleVal) {
@@ -1734,7 +1773,6 @@
 
             const newId = idField.value.trim();
 
-            // Validate ID
             if (!newId) {
                 if (!silent) setFieldError('field-id', null);
                 return null;
@@ -1754,7 +1792,6 @@
                 return null;
             }
 
-            // Validate title
             clearFieldError('field-title', 'hint-title');
             if (!titleVal) {
                 if (!silent) {
@@ -1764,7 +1801,6 @@
                 return null;
             }
 
-            // Validate date format
             const dateVal = document.getElementById('field-date').value.trim();
             clearFieldError('field-date', 'hint-date');
             if (dateVal && !/^\d{4}\.\d{2}\.\d{2}$/.test(dateVal)) {
@@ -1880,7 +1916,6 @@
                 const raw = marked.parse(document.getElementById('field-content').value);
                 preview.innerHTML = DOMPurify.sanitize(raw);
 
-                // Phase 2: Resolve locally uploaded images to Blob URLs in the editor preview
                 const images = preview.querySelectorAll('img');
                 images.forEach(img => {
                     const src = img.getAttribute('src');
@@ -1913,7 +1948,6 @@
             document.getElementById('more-menu').classList.remove('open');
         }
 
-        // Close dropdown when clicking outside
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.dropdown')) {
                 closeDropdown();
@@ -1949,7 +1983,6 @@
             document.body.style.overflow = '';
         }
 
-        // Swipe-to-close for bottom sheet
         (function initBottomSheetSwipe() {
             let startY = 0;
             let currentY = 0;
@@ -1993,7 +2026,6 @@
                 grabBar.addEventListener('touchmove', onTouchMove, { passive: true });
                 grabBar.addEventListener('touchend', onTouchEnd, { passive: true });
 
-                // Also allow dragging from sidebar header area
                 const sidebarHeader = sidebar.querySelector('.sidebar-header');
                 if (sidebarHeader) {
                     sidebarHeader.addEventListener('touchstart', onTouchStart, { passive: true });
@@ -2056,7 +2088,7 @@
                     if (selected) {
                         before = '[';
                         after = '](url)';
-                        cursorOffset = -1; // place cursor inside (url)
+                        cursorOffset = -1;
                     } else {
                         before = '[';
                         after = '](url)';
@@ -2076,7 +2108,6 @@
             }
 
             if (isPrefix) {
-                // Find the start of the current line
                 const lineStart = text.lastIndexOf('\n', start - 1) + 1;
                 const insertText = selected || placeholder;
                 const newText = text.substring(0, lineStart) + before + text.substring(lineStart);
@@ -2086,7 +2117,6 @@
                     textarea.selectionStart = start + before.length;
                     textarea.selectionEnd = end + before.length;
                 } else {
-                    // Insert prefix + placeholder at line start, replacing from line start to start
                     const currentLineContent = text.substring(lineStart, start);
                     textarea.value = text.substring(0, lineStart) + before + currentLineContent + insertText + text.substring(start);
                     const newCursor = lineStart + before.length + currentLineContent.length;
@@ -2094,7 +2124,6 @@
                     textarea.selectionEnd = newCursor + insertText.length;
                 }
             } else {
-                // Wrap type
                 const insertText = selected || placeholder;
                 const newText = text.substring(0, start) + before + insertText + after + text.substring(end);
                 textarea.value = newText;
@@ -2109,7 +2138,6 @@
             }
 
             textarea.focus();
-            // Trigger input event for any listeners
             textarea.dispatchEvent(new Event('input', { bubbles: true }));
         }
 
@@ -2208,11 +2236,9 @@
             const reader = new FileReader();
             reader.onload = (e) => {
                 const dataUrl = e.target.result;
-                // Extract base64 (strip data:image/xxx;base64, prefix)
                 const base64 = dataUrl.split(',')[1];
                 uploadFileData = { base64, name: file.name, size: file.size, type: file.type };
 
-                // Show preview
                 document.getElementById('upload-preview-img').src = dataUrl;
                 document.getElementById('upload-preview-name').textContent = file.name;
                 document.getElementById('upload-preview-size').textContent = (file.size / 1024).toFixed(1) + ' KB';
@@ -2237,8 +2263,7 @@
                 return;
             }
 
-            // Phase 1: 保存先を public/images/ に変更
-            const imagePath = `public/images/${filename}`;
+            const imagePath = `images/${filename}`;
             const token = getToken();
             const headers = {
                 'Authorization': `Bearer ${token}`,
@@ -2254,10 +2279,11 @@
             statusText.textContent = 'Checking existing file...';
 
             try {
-                // Check if file already exists (need SHA to overwrite)
                 let existingSha = null;
+                const owner = getGithubOwner();
+                const repo = getGithubRepo();
                 const checkRes = await fetch(
-                    `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${imagePath}?ref=${BRANCH}`,
+                    `https://api.github.com/repos/${owner}/${repo}/contents/${imagePath}?ref=${BRANCH}`,
                     { headers }
                 );
                 if (checkRes.ok) {
@@ -2274,7 +2300,7 @@
                 if (existingSha) putBody.sha = existingSha;
 
                 const putRes = await fetch(
-                    `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${imagePath}`,
+                    `https://api.github.com/repos/${owner}/${repo}/contents/${imagePath}`,
                     {
                         method: 'PUT',
                         headers: { ...headers, 'Content-Type': 'application/json' },
@@ -2287,7 +2313,6 @@
                     throw new Error(err.message || `HTTP ${putRes.status}`);
                 }
 
-                // Phase 1: 挿入するマークダウンスニペットを相対パス化
                 const mdSnippet = `![${filename}](../images/${filename})`;
                 const textarea = document.getElementById('field-content');
                 if (textarea) {
@@ -2298,7 +2323,6 @@
                     textarea.dispatchEvent(new Event('input', { bubbles: true }));
                 }
 
-                // Phase 2: メモリ内キャッシュへ Blob URL を登録
                 const fileInput = document.getElementById('upload-file-input');
                 if (fileInput && fileInput.files && fileInput.files[0]) {
                     const file = fileInput.files[0];
@@ -2317,7 +2341,7 @@
         }
 
         // ══════════════════════════════════════
-        // Utilities
+        // Utilities (Export & Download)
         // ══════════════════════════════════════
         function escapeHtml(str) {
             const div = document.createElement('div');
@@ -2330,11 +2354,6 @@
             return String(str).replace(/&/g, '&amp;').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
         }
 
-        function escapeSingleQuote(str) {
-            if (!str) return '';
-            return String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-        }
-
         function showToast(msg, type) {
             const toast = document.getElementById('toast');
             toast.textContent = msg;
@@ -2344,8 +2363,37 @@
             }, 3000);
         }
 
+        function exportNewsData() {
+            const dataStr = JSON.stringify(articles.map(a => {
+                const copy = { ...a };
+                delete copy.content;
+                return copy;
+            }), null, 2);
+            
+            const w = window.open();
+            w.document.open();
+            w.document.write(`<pre>${escapeHtml(dataStr)}</pre>`);
+            w.document.close();
+        }
+
+        function downloadNewsData() {
+            const dataStr = JSON.stringify(articles.map(a => {
+                const copy = { ...a };
+                delete copy.content;
+                return copy;
+            }), null, 2);
+            
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'news_index.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
         // ══════════════════════════════════════
-        // Init
+        // Init Load
         // ══════════════════════════════════════
         document.addEventListener('DOMContentLoaded', init);
     </script>

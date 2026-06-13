@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News | Tetra</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="../style/style.css">
+    <link rel="icon" href="../images/official_logo_sq_ske_white.png" type="image/png">
+</head>
+
+<body>
+
+    <header>
+        <div class="header-inner">
+            <a href="../index.html" class="logo-box">
+                <img src="../images/official_logo_sq_ske_white.png" alt="Tetra">
+            </a>
+
+            <button class="hamburger-btn" aria-label="Menu">
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </button>
+
+            <nav class="desktop-nav">
+                <a href="news.html" class="nav-link current">News</a>
+                <a href="../programming/programming.html" class="nav-link">Programming</a>
+                <a href="../graphics/graphics.html" class="nav-link">Graphics</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <section class="page-hero">
+                <h1 class="page-title">News</h1>
+                <p class="page-desc">
+                    活動報告、イベント情報、Tetraからのお知らせ。<br>
+                    最新の情報をチェックしてください。
+                </p>
+            </section>
+
+            <section class="news-archive-section">
+                <!-- News List -->
+                <ul class="news-archive-list" id="news-archive-list">
+                    <!-- Dynamic Content -->
+                </ul>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const list = document.getElementById('news-archive-list');
+            if (!list) return;
+
+            try {
+                const res = await fetch('news_index.json?t=' + Date.now());
+                if (!res.ok) throw new Error('Failed to fetch news index');
+                const newsItems = await res.json();
+
+                const sortedNews = newsItems.sort((a, b) => new Date(b.date) - new Date(a.date));
+                const now = new Date();
+
+                sortedNews.forEach(item => {
+                    // Check publication time
+                    if (item.publishAt) {
+                        const publishDate = new Date(item.publishAt);
+                        if (now < publishDate) return; // Skip future items
+                    }
+
+                    const li = document.createElement('li');
+                    li.className = 'news-archive-item';
+
+                    // URL resolution relative to news/
+                    let adjustedUrl = item.url;
+
+                    if (!adjustedUrl && item.id) {
+                        adjustedUrl = `article.html?id=${item.id}`;
+                    } else if (adjustedUrl) {
+                        if (adjustedUrl.startsWith('./news/')) {
+                            adjustedUrl = adjustedUrl.replace('./news/', '');
+                        } else if (adjustedUrl.startsWith('./')) {
+                            adjustedUrl = '../' + adjustedUrl.substring(2);
+                        }
+                    }
+
+                    li.innerHTML = `
+                    <a href="${adjustedUrl}" class="news-link">
+                        <span class="news-date">${item.date}</span>
+                        <span class="news-label ${item.type}">${item.label}</span>
+                        <span class="news-title">${item.title}</span>
+                        <span class="news-arrow">→</span>
+                    </a>
+                `;
+                    list.appendChild(li);
+                });
+            } catch (error) {
+                console.error('Failed to load news archive:', error);
+            }
+        });
+    </script>
+
+    <!-- Mobile Navigation Overlay -->
+    <div class="mobile-nav-overlay">
+        <div class="mobile-nav-content">
+            <nav class="mobile-nav-links">
+                <a href="../index.html" class="mobile-link">Home</a>
+                <a href="news.html" class="mobile-link">News</a>
+                <a href="../programming/programming.html" class="mobile-link">Programming</a>
+                <a href="../graphics/graphics.html" class="mobile-link">Graphics</a>
+            </nav>
+            <div class="mobile-socials">
+                <a href="https://www.instagram.com/tetra.00000100/"><img src="../images/Instagram_Glyph_White.png"
+                        alt="Instagram"></a>
+                <a href="https://x.com/Tetra00000100"><img src="../images/x_logo-white.png" alt="X"></a>
+                <a href="https://www.youtube.com/@Tetra.0100"><img src="../images/youtube_social_square_dark.png"
+                        alt="YouTube" style="filter: invert(1);"></a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="social-links">
+            <a href="https://www.instagram.com/tetra.00000100/"><img src="../images/Instagram_Glyph_White.png"
+                    alt="Instagram"></a>
+            <a href="https://x.com/Tetra00000100"><img src="../images/x_logo-white.png" alt="X"></a>
+            <a href="https://www.youtube.com/@Tetra.0100"><img src="../images/youtube_social_square_dark.png" alt="YouTube"
+                    style="filter: invert(1);"></a>
+        </div>
+        <p class="copyright">&copy; Tetra Meiji Gakuin Univ.</p>
+    </footer>
+
+    <script src="../script/script.js" type="module"></script>
+</body>
+
+</html>
