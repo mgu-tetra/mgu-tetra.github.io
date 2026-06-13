@@ -1,14 +1,5 @@
 [
   {
-    "id": "test",
-    "date": "2026.06.14",
-    "label": "Info",
-    "type": "info",
-    "title": "Test",
-    "publishAt": "2026-06-13T15:00:00+09:00",
-    "url": "./news/article.html?id=test"
-  },
-  {
     "id": "MagiCode",
     "date": "2026.05.28",
     "label": "Info",
