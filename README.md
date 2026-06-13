@@ -22,4 +22,4 @@ Tetra は主に以下の2つの部門で活動しています。
 本サイトには、外部のデータベースやサーバーを必要としない **サーバーレス/ヘッドレス型のニュース配信システム** が組み込まれています。
 
 ---
-Copyright © Tetra All rights reserved.
+```Copyright © Tetra All rights reserved.```
