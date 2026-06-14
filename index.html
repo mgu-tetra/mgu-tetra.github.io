@@ -46,9 +46,14 @@
             <div class="ticker-container">
                 <a href="news/news.html" class="ticker-label">NEWS</a>
                 <div class="ticker-list-wrapper">
-                    <ul class="ticker-list" id="ticker-list">
-                        <!-- Dynamic Content Loaded via JS -->
-                    </ul>
+                    <div class="ticker-track" id="ticker-track">
+                        <ul class="ticker-list" id="ticker-list">
+                            <!-- Dynamic Content Loaded via JS -->
+                        </ul>
+                        <ul class="ticker-list ticker-list-clone" id="ticker-list-clone">
+                            <!-- Cloned Content for Seamless Loop -->
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -84,6 +89,7 @@
                     const sortedNews = newsItems.sort((a, b) => new Date(b.date) - new Date(a.date));
                     const now = new Date();
 
+                    let hasItems = false;
                     sortedNews.forEach(item => {
                         // Check publication time
                         if (item.publishAt) {
@@ -109,7 +115,31 @@
                     </a>
                 `;
                         tickerList.appendChild(li);
+                        hasItems = true;
                     });
+
+                    if (hasItems) {
+                        // Clone items for seamless loop
+                        const tickerListClone = document.getElementById('ticker-list-clone');
+                        if (tickerListClone) {
+                            tickerListClone.innerHTML = tickerList.innerHTML;
+                        }
+
+                        // Dynamically adjust animation duration based on content width for constant speed
+                        const tickerTrack = document.getElementById('ticker-track');
+                        if (tickerTrack) {
+                            // Wait for a render frame to ensure offsetWidth is populated
+                            requestAnimationFrame(() => {
+                                const listWidth = tickerList.offsetWidth;
+                                if (listWidth > 0) {
+                                    // 50px per second speed
+                                    const speed = 50; 
+                                    const duration = listWidth / speed;
+                                    tickerTrack.style.animationDuration = `${duration}s`;
+                                }
+                            });
+                        }
+                    }
                 } catch (error) {
                     console.error('Failed to initialize news ticker:', error);
                 }
