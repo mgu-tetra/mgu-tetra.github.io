@@ -61,6 +61,28 @@
             const list = document.getElementById('news-archive-list');
             if (!list) return;
 
+            function escapeHtml(str) {
+                if (!str) return '';
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            }
+
+            function escapeAttr(str) {
+                if (!str) return '';
+                return String(str).replace(/&/g, '&amp;').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+            }
+
+            function sanitizeUrl(url) {
+                if (!url) return '#';
+                try {
+                    const parsed = new URL(url, window.location.href);
+                    if (['http:', 'https:'].includes(parsed.protocol)) return url;
+                } catch(e) {}
+                if (url.startsWith('./') || url.startsWith('../') || !url.includes(':')) return url;
+                return '#';
+            }
+
             try {
                 const res = await fetch('news_index.json?t=' + Date.now());
                 if (!res.ok) throw new Error('Failed to fetch news index');
@@ -93,10 +115,10 @@
                     }
 
                     li.innerHTML = `
-                    <a href="${adjustedUrl}" class="news-link">
-                        <span class="news-date">${item.date}</span>
-                        <span class="news-label ${item.type}">${item.label}</span>
-                        <span class="news-title">${item.title}</span>
+                    <a href="${sanitizeUrl(adjustedUrl)}" class="news-link">
+                        <span class="news-date">${escapeHtml(item.date)}</span>
+                        <span class="news-label ${escapeAttr(item.type)}">${escapeHtml(item.label)}</span>
+                        <span class="news-title">${escapeHtml(item.title)}</span>
                         <span class="news-arrow">→</span>
                     </a>
                 `;

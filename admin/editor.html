@@ -1322,12 +1322,11 @@
                 });
             }
         }
-
         // ══════════════════════════════════════
         // GitHub Authentication
         // ══════════════════════════════════════
         function getToken() {
-            return sessionStorage.getItem(STORAGE_KEY_PAT) || localStorage.getItem(STORAGE_KEY_PAT);
+            return sessionStorage.getItem(STORAGE_KEY_PAT);
         }
 
         function isAuthenticated() {
@@ -1335,8 +1334,20 @@
         }
 
         function restoreAuth() {
+            // Safe migration: if PAT or USER exist in localStorage, move them to sessionStorage and remove from localStorage
+            const localPat = localStorage.getItem(STORAGE_KEY_PAT);
+            const localUser = localStorage.getItem(STORAGE_KEY_USER);
+            if (localPat) {
+                sessionStorage.setItem(STORAGE_KEY_PAT, localPat);
+                localStorage.removeItem(STORAGE_KEY_PAT);
+            }
+            if (localUser) {
+                sessionStorage.setItem(STORAGE_KEY_USER, localUser);
+                localStorage.removeItem(STORAGE_KEY_USER);
+            }
+
             const token = getToken();
-            const user = sessionStorage.getItem(STORAGE_KEY_USER) || localStorage.getItem(STORAGE_KEY_USER);
+            const user = sessionStorage.getItem(STORAGE_KEY_USER);
             if (token && user) {
                 setAuthUI(true, user);
             } else if (token) {
@@ -1354,11 +1365,7 @@
                 if (res.ok) {
                     const data = await res.json();
                     const username = data.login;
-                    if (localStorage.getItem(STORAGE_KEY_PAT) === token) {
-                        localStorage.setItem(STORAGE_KEY_USER, username);
-                    } else {
-                        sessionStorage.setItem(STORAGE_KEY_USER, username);
-                    }
+                    sessionStorage.setItem(STORAGE_KEY_USER, username);
                     setAuthUI(true, username);
                 } else {
                     disconnectGitHub();
@@ -1404,8 +1411,10 @@
 
                 const remember = document.getElementById('remember-pat').checked;
                 if (remember) {
-                    localStorage.setItem(STORAGE_KEY_PAT, token);
-                    localStorage.setItem(STORAGE_KEY_USER, data.login);
+                    // PAT and USER are stored in sessionStorage only (for security)
+                    sessionStorage.setItem(STORAGE_KEY_PAT, token);
+                    sessionStorage.setItem(STORAGE_KEY_USER, data.login);
+                    // Non-sensitive settings are stored in localStorage
                     localStorage.setItem(STORAGE_KEY_OWNER, owner);
                     localStorage.setItem(STORAGE_KEY_REPO, repo);
                 } else {
