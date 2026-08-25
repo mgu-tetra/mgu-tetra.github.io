@@ -2,7 +2,7 @@
   "@context": "https://w3id.org/openbadges/v2",
   "type": "Issuer",
   "id": "https://mgu-tetra.github.io/issuer.json",
-  "name": "tetra member",
+  "name": "tetra",
   "url": "https://mgu-tetra.github.io",
-  "email": "contact@example.com"
+  "email": "24ms1009@meijigakuin.ac.jp"
 }
