@@ -1,0 +1,19 @@
+{
+  "@context": "https://w3id.org/openbadges/v2",
+  "type": "BadgeClass",
+  "id": "https://mgu-tetra.github.io/badges/executive-2025.json",
+  "name": "tetra 2025年度 幹部役員 認証",
+  "description": "学生団体tetraにおいて、2025年度の幹部役員として組織運営・活動推進および1年間の任期を満了したことを証明する公式デジタルバッジです。",
+  "image": "https://mgu-tetra.github.io/images/executive-2025.png",
+  "criteria": {
+    "narrative": "【授与基準】\n1. 2025年度総会において幹部役員として選任されたこと。\n2. 1年間の任期中、定例会議の運営および全体行事の統括に携わったこと。\n3. 次期幹部への業務引き継ぎを完了し、役員会から任期満了が承認されたこと。"
+  },
+  "issuer": "https://mgu-tetra.github.io/issuer.json",
+  "tags": [
+    "tetra",
+    "学生団体",
+    "組織運営",
+    "リーダーシップ",
+    "プロジェクトマネジメント"
+  ]
+}
