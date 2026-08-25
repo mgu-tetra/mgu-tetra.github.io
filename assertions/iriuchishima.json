@@ -1,7 +1,7 @@
 {
   "@context": "https://w3id.org/openbadges/v2",
   "type": "Assertion",
-  "id": "https://mgu-tetra.github.io/assertions/2025-iriuchishima.json",
+  "id": "https://mgu-tetra.github.io/assertions/iriuchishima.json",
   "recipient": {
     "type": "email",
     "hashed": true,
@@ -9,7 +9,7 @@
     "identity": "sha256$3fda716eed16c35ecab7930703f2fa071219709ce408fffc015604b4f5ea7736"
   },
   "issuedOn": "2026-03-31T00:00:00Z",
-  "badge": "https://mgu-tetra.github.io/badges/executive-2025.json",
+  "badge": "https://mgu-tetra.github.io/badges/test.json",
   "verification": {
     "type": "HostedBadge"
   }
