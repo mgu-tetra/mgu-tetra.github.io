@@ -1,7 +1,7 @@
 {
   "@context": "https://w3id.org/openbadges/v2",
   "type": "Assertion",
-  "id": "https://mgu-tetra.github.io/assertions/2025-iriuchiahima.json",
+  "id": "https://mgu-tetra.github.io/assertions/2025-iriuchishima.json",
   "recipient": {
     "type": "email",
     "hashed": true,
