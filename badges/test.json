@@ -1,7 +1,7 @@
 {
   "@context": "https://w3id.org/openbadges/v2",
   "type": "BadgeClass",
-  "id": "https://mgu-tetra.github.io/badges/test.json.json",
+  "id": "https://mgu-tetra.github.io/badges/test.json",
   "name": "tetra 第1期 幹部役員 認証",
   "description": "学生団体Tetraにおいて、第1期の幹部役員として組織運営・活動推進に貢献したことを証明する公式デジタルバッジです。",
   "image": "https://mgu-tetra.github.io/images/test.png",
