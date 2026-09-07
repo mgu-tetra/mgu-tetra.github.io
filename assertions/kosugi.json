@@ -1,12 +1,12 @@
 {
     "@context": "https://w3id.org/openbadges/v2",
     "type": "Assertion",
-    "id": "https://mgu-tetra.github.io/assertions/akatani.json",
+    "id": "https://mgu-tetra.github.io/assertions/kosugi.json",
     "recipient": {
         "type": "email",
         "hashed": true,
-        "salt": "dd6b14986d3c72048e16301797043c92",
-        "identity": "sha256$13f1bac47bfe84b11555f097875824f2119eddf8f7239a2a92ee940962efcf03"
+        "salt": "e519938f4d21e4be55f0c431924d14b4",
+        "identity": "sha256$5045be9ecf0df2141853ee02ae39374713d23b6269f809a55205a5c86a2ed701"
     },
     "issuedOn": "2026-09-07T00:00:00Z",
     "badge": "https://mgu-tetra.github.io/badges/executive_01.json",

@@ -1,0 +1,16 @@
+{
+  "@context": "https://w3id.org/openbadges/v2",
+  "type": "Assertion",
+  "id": "https://mgu-tetra.github.io/assertions/yamada.json",
+  "recipient": {
+    "type": "email",
+    "hashed": true,
+    "salt": "6442de037df206e152ec9ef2d0a03efe",
+    "identity": "sha256$e31d8fa83736d645c5b1a0a6f946f299849938e8a2974036ababf8d15654a3ef"
+  },
+  "issuedOn": "2026-09-07T00:00:00Z",
+  "badge": "https://mgu-tetra.github.io/badges/executive_01.json",
+  "verification": {
+    "type": "HostedBadge"
+  }
+}

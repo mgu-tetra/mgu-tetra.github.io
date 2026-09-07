@@ -1,0 +1,16 @@
+{
+  "@context": "https://w3id.org/openbadges/v2",
+  "type": "Assertion",
+  "id": "https://mgu-tetra.github.io/assertions/hayashida.json",
+  "recipient": {
+    "type": "email",
+    "hashed": true,
+    "salt": "956ed547f5e41bf51ac3738bafbc8c44",
+    "identity": "sha256$48d39292e5fed0abd1b78c45074b75d9e50056de4cb0700df771fc9c88d18770"
+  },
+  "issuedOn": "2026-09-07T00:00:00Z",
+  "badge": "https://mgu-tetra.github.io/badges/executive_01.json",
+  "verification": {
+    "type": "HostedBadge"
+  }
+}

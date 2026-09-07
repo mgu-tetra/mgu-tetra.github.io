@@ -1,0 +1,16 @@
+{
+  "@context": "https://w3id.org/openbadges/v2",
+  "type": "Assertion",
+  "id": "https://mgu-tetra.github.io/assertions/suganuma.json",
+  "recipient": {
+    "type": "email",
+    "hashed": true,
+    "salt": "240b15d8a8532cda8f301615493da1a8",
+    "identity": "sha256$396314969a6b107f98fbd7abaec6a649f38b0beafbc0d6bd37183f4b96c50738"
+  },
+  "issuedOn": "2026-09-07T00:00:00Z",
+  "badge": "https://mgu-tetra.github.io/badges/executive_01.json",
+  "verification": {
+    "type": "HostedBadge"
+  }
+}

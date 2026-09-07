@@ -1,0 +1,16 @@
+{
+  "@context": "https://w3id.org/openbadges/v2",
+  "type": "Assertion",
+  "id": "https://mgu-tetra.github.io/assertions/fujii.json",
+  "recipient": {
+    "type": "email",
+    "hashed": true,
+    "salt": "7380f77090d5ae89a0102c8197f4a980",
+    "identity": "sha256$22aee85376679472a12778ec210bf0040ecaf67c01cea104a38c82eb0ad14f78"
+  },
+  "issuedOn": "2026-09-07T00:00:00Z",
+  "badge": "https://mgu-tetra.github.io/badges/executive_01.json",
+  "verification": {
+    "type": "HostedBadge"
+  }
+}
