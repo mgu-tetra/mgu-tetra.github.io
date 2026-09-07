@@ -1,0 +1,30 @@
+{
+    "@context": "https://w3id.org/openbadges/v2",
+    "type": "BadgeClass",
+    "id": "https://mgu-tetra.github.io/badges/executive_01.json",
+    "name": "Tetra 第1期 幹部 認証",
+    "description": "明治学院大学任意団体Tetraにおいて、第1期の幹部として組織運営・活動推進に貢献したことを証明する公式デジタルバッジです。",
+    "image": "https://mgu-tetra.github.io/images/open_badge_leader.png",
+    "criteria": {
+        "narrative": "【授与基準】\n1. 2025年度総会において幹部として選任されたこと。\n2. 1年間の任期中、定例会議の運営および全体行事の統括に携わったこと。\n3. 次期幹部への業務引き継ぎを完了し、役員会から任期満了が承認されたこと。"
+    },
+    "issuer": "https://mgu-tetra.github.io/issuer.json",
+    "tags": [
+        "明治学院大学",
+        "任意団体",
+        "Tetra",
+        "代表",
+        "2025年度",
+        "programming",
+        "AI",
+        "graphics",
+        "cybersecurity",
+        "IOT",
+        "web",
+        "game",
+        "music",
+        "leadership",
+        "organization",
+        "project management"
+    ]
+}

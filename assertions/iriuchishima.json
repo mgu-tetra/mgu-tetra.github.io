@@ -5,10 +5,10 @@
   "recipient": {
     "type": "email",
     "hashed": true,
-    "salt": "e18454ad0f7f4b18be1f349d5a7e0e44",
-    "identity": "sha256$3fda716eed16c35ecab7930703f2fa071219709ce408fffc015604b4f5ea7736"
+    "salt": "4a7b8140d477178380ef7fc4038b3353",
+    "identity": "sha256$72a870b06eb8df58619b94ecff998aa9def8858de6902c76e1d9a7f2505d5446"
   },
-  "issuedOn": "2026-03-31T00:00:00Z",
+  "issuedOn": "2026-09-07T00:00:00Z",
   "badge": "https://mgu-tetra.github.io/badges/leader_01.json",
   "verification": {
     "type": "HostedBadge"
