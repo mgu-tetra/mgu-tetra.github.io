@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Open Badges Issuer | Tetra Admin</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="icon" href="../images/official_logo_sq_ske_white.png" type="image/png">
+
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --surface: #141414;
+            --surface-hover: #1a1a1a;
+            --surface-raised: #1e1e1e;
+            --border: #2a2a2a;
+            --border-focus: #0A84FF;
+            --text: #f5f5f5;
+            --text-secondary: #999;
+            --text-tertiary: #666;
+            --accent: #0A84FF;
+            --accent-hover: #409CFF;
+            --accent-light: rgba(10, 132, 255, 0.15);
+            --danger: #FF453A;
+            --danger-hover: #FF6961;
+            --success: #30D158;
+            --warning: #FF9F0A;
+            --radius: 12px;
+            --radius-sm: 8px;
+            --font: -apple-system, BlinkMacSystemFont, "Google Sans", "Helvetica Neue", sans-serif;
+            --font-mono: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Layout */
+        .app {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            grid-template-rows: auto 1fr;
+            height: 100vh;
+        }
+
+        @media (max-width: 960px) {
+            .app {
+                grid-template-columns: 1fr;
+                height: auto;
+                min-height: 100vh;
+            }
+        }
+
+        /* Header */
+        .header {
+            grid-column: 1 / -1;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .logo img {
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+        }
+
+        .badge-nav-link {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 4px 10px;
+            border-radius: 6px;
+            background: var(--surface-raised);
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+        }
+
+        .badge-nav-link:hover {
+            color: var(--text);
+            border-color: #444;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .auth-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: var(--surface-raised);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .auth-status:hover {
+            border-color: #444;
+        }
+
+        .auth-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #666;
+        }
+
+        .auth-dot.connected {
+            background: var(--success);
+            box-shadow: 0 0 8px rgba(48, 209, 88, 0.4);
+        }
+
+        .auth-user {
+            color: var(--text-secondary);
+            max-width: 140px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: var(--surface-raised);
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            background: var(--surface-hover);
+            border-color: #444;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--accent-hover);
+            border-color: var(--accent-hover);
+        }
+
+        .btn-success {
+            background: var(--success);
+            border-color: var(--success);
+            color: #000;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            opacity: 0.9;
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            height: calc(100vh - 57px);
+        }
+
+        @media (max-width: 960px) {
+            .sidebar {
+                height: auto;
+                max-height: 350px;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+        }
+
+        .sidebar-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sidebar-title {
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+        }
+
+        .sidebar-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+
+        .assertion-item {
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: background 0.15s;
+            margin-bottom: 4px;
+            border: 1px solid transparent;
+        }
+
+        .assertion-item:hover {
+            background: var(--surface-hover);
+        }
+
+        .assertion-item.active {
+            background: var(--accent-light);
+            border-color: rgba(10, 132, 255, 0.3);
+        }
+
+        .assertion-item .item-id {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 2px;
+            word-break: break-all;
+        }
+
+        .assertion-item .item-date {
+            font-size: 11px;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+        }
+
+        .assertion-item .item-badge-name {
+            font-size: 11px;
+            color: var(--accent);
+            margin-top: 4px;
+        }
+
+        /* Main Workspace */
+        .workspace {
+            display: grid;
+            grid-template-columns: 1.1fr 1fr;
+            overflow: hidden;
+            height: calc(100vh - 57px);
+        }
+
+        @media (max-width: 1200px) {
+            .workspace {
+                grid-template-columns: 1fr;
+                height: auto;
+                overflow: visible;
+            }
+        }
+
+        /* Form Area */
+        .form-panel {
+            padding: 24px;
+            overflow-y: auto;
+            border-right: 1px solid var(--border);
+        }
+
+        @media (max-width: 1200px) {
+            .form-panel {
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+        }
+
+        .panel-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .section-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .section-card-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            background: var(--surface-raised);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text);
+            font-size: 13px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--border-focus);
+        }
+
+        .form-group input[readonly] {
+            background: #111;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+            font-size: 12px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .input-group input {
+            flex: 1;
+        }
+
+        .form-hint {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            margin-top: 5px;
+            line-height: 1.4;
+        }
+
+        .computed-badge {
+            background: rgba(48, 209, 88, 0.1);
+            border: 1px solid rgba(48, 209, 88, 0.25);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            margin-top: 12px;
+        }
+
+        .computed-row {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+
+        .computed-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .computed-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--success);
+            text-transform: uppercase;
+        }
+
+        .computed-value {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            word-break: break-all;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 6px 8px;
+            border-radius: 4px;
+            color: #d1fae5;
+        }
+
+        /* Badge Preview Card */
+        .selected-badge-preview {
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            background: var(--surface-raised);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            margin-top: 10px;
+        }
+
+        .selected-badge-preview img {
+            width: 56px;
+            height: 56px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: #222;
+        }
+
+        .selected-badge-info h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .selected-badge-info p {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.3;
+        }
+
+        /* Preview Panel */
+        .preview-panel {
+            padding: 24px;
+            background: var(--surface);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .preview-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .json-viewer-container {
+            position: relative;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .json-code {
+            background: #080808;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            color: #a5d6ff;
+            font-family: var(--font-mono);
+            font-size: 12.5px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-all;
+            overflow-x: auto;
+            flex: 1;
+            min-height: 360px;
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        /* Modal */
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-backdrop.open {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            width: 100%;
+            max-width: 480px;
+            padding: 24px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        .modal-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .modal-body {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 12px 20px;
+            border-radius: var(--radius-sm);
+            background: var(--surface-raised);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            z-index: 3000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        .toast.error {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <a href="../index.html" class="logo">
+                    <img src="../images/official_logo_sq_ske_white.png" alt="Tetra">
+                    <span>Tetra Badges</span>
+                </a>
+                <a href="./editor.html" class="badge-nav-link">← News Editor へ</a>
+            </div>
+            <div class="header-actions">
+                <div class="auth-status" id="auth-btn" onclick="openAuthModal()">
+                    <div class="auth-dot" id="auth-dot"></div>
+                    <span class="auth-user" id="auth-user-label">GitHub 未接続</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Sidebar (Existing Assertions) -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-title">発行済みレコード</span>
+                <button class="btn btn-sm btn-primary" onclick="newAssertion()">+ 新規作成</button>
+            </div>
+            <div class="sidebar-list" id="assertions-list">
+                <!-- Dynamically populated -->
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="workspace">
+            <!-- Form Area -->
+            <div class="form-panel">
+                <div class="panel-title">
+                    <span>🎖️ Open Badge 授与情報の発行</span>
+                </div>
+                <p class="panel-desc">
+                    受領者のメールアドレスを入力すると、ソルト付き SHA-256 ハッシュが自動計算され、安全な Assertion レコードが生成されます。
+                </p>
+
+                <!-- 1. バッジ選択 -->
+                <div class="section-card">
+                    <div class="section-card-title">
+                        <span>1. 授与するバッジ（BadgeClass）</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="badge-select">バッジの種類</label>
+                        <select id="badge-select" onchange="handleBadgeSelect()">
+                            <option value="https://mgu-tetra.github.io/badges/leader_01.json">Tetra 第1期 代表 認証 (leader_01.json)</option>
+                            <option value="https://mgu-tetra.github.io/badges/leader.json">Tetra 第1期 幹部役員 (leader.json)</option>
+                            <option value="custom">カスタムURLを入力...</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="custom-badge-group" style="display: none;">
+                        <label for="custom-badge-url">バッジ定義の URL</label>
+                        <input type="url" id="custom-badge-url" placeholder="https://mgu-tetra.github.io/badges/your_badge.json" oninput="updateAssertion()">
+                    </div>
+                    <div class="selected-badge-preview" id="badge-preview-card">
+                        <img id="badge-img" src="../images/open_badge_leader.png" alt="Badge preview">
+                        <div class="selected-badge-info">
+                            <h4 id="badge-name-label">Tetra 第1期 代表 認証</h4>
+                            <p id="badge-desc-label">明治学院大学任意団体Tetraにおいて、第1期の代表として組織運営・活動推進に貢献したことを証明する公式デジタルバッジです。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. 受領者情報（Recipient） -->
+                <div class="section-card">
+                    <div class="section-card-title">
+                        <span>2. 受領者情報（Recipient）</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="recipient-email">受領者のメールアドレス <span style="color:var(--danger)">*</span></label>
+                        <input type="email" id="recipient-email" placeholder="example@ed.meijigakuin.ac.jp" oninput="handleEmailInput()" autocomplete="off">
+                        <div class="form-hint">
+                            ※このメールアドレスは外部サーバーには送信されず、ブラウザの Web Crypto API のみでハッシュ化されます。
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="recipient-salt">ソルト（Salt）</label>
+                        <div class="input-group">
+                            <input type="text" id="recipient-salt" readonly>
+                            <button class="btn btn-sm" onclick="regenerateSalt()" title="ソルトを再生成">再生成</button>
+                        </div>
+                    </div>
+
+                    <!-- 計算結果 -->
+                    <div class="computed-badge">
+                        <div class="computed-row">
+                            <span class="computed-label">自動計算された Identity (SHA-256)</span>
+                            <div class="computed-value" id="computed-identity">sha256$（メールアドレスを入力してください）</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. 発行・メタデータ -->
+                <div class="section-card">
+                    <div class="section-card-title">
+                        <span>3. 発行メタデータ</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="recipient-slug">受領者識別スラッグ（ファイル名） <span style="color:var(--danger)">*</span></label>
+                        <div class="input-group">
+                            <span style="display:flex; align-items:center; font-family:var(--font-mono); font-size:12px; color:var(--text-secondary)">assertions/</span>
+                            <input type="text" id="recipient-slug" placeholder="e.g. iriuchishima" oninput="updateAssertion()">
+                            <span style="display:flex; align-items:center; font-family:var(--font-mono); font-size:12px; color:var(--text-secondary)">.json</span>
+                        </div>
+                        <div class="form-hint">英数字およびハイフン・アンダースコア推奨（URLの一部になります）</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="issued-on">授与日（issuedOn）</label>
+                        <input type="date" id="issued-on" onchange="updateAssertion()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preview Panel -->
+            <div class="preview-panel">
+                <div class="preview-header">
+                    <div class="panel-title">
+                        <span>📄 Assertion JSON プレビュー</span>
+                    </div>
+                </div>
+
+                <div class="json-viewer-container">
+                    <pre class="json-code" id="json-preview">Loading...</pre>
+                </div>
+
+                <div class="action-bar">
+                    <button class="btn" onclick="copyJson()">📋 JSONをコピー</button>
+                    <button class="btn" onclick="downloadJson()">💾 JSONをダウンロード</button>
+                    <button class="btn btn-primary" id="publish-btn" onclick="publishToGitHub()">
+                        🚀 GitHub に直接発行（コミット）
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- GitHub Auth Modal -->
+    <div class="modal-backdrop" id="auth-modal">
+        <div class="modal">
+            <div class="modal-title">GitHub 接続設定</div>
+            <div class="modal-body">
+                <p style="margin-bottom:12px;">GitHub の Personal Access Token (PAT) を設定すると、ブラウザから直接リポジトリへコミットしてバッジを発行できます。</p>
+                
+                <div class="form-group">
+                    <label for="owner-input">GitHub Owner</label>
+                    <input type="text" id="owner-input" value="mgu-tetra">
+                </div>
+                <div class="form-group">
+                    <label for="repo-input">Repository</label>
+                    <input type="text" id="repo-input" value="mgu-tetra.github.io">
+                </div>
+                <div class="form-group">
+                    <label for="pat-input">Personal Access Token (PAT)</label>
+                    <input type="password" id="pat-input" placeholder="ghp_xxxx or github_pat_xxxx">
+                    <div class="form-hint">※トークンは sessionStorage にのみ保持され、ブラウザを閉じると消去されます。</div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn" onclick="closeAuthModal()">キャンセル</button>
+                <button class="btn btn-danger" id="disconnect-btn" onclick="disconnectGitHub()" style="display:none;">切断</button>
+                <button class="btn btn-primary" onclick="connectGitHub()">接続する</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Overwrite Modal -->
+    <div class="modal-backdrop" id="confirm-modal">
+        <div class="modal">
+            <div class="modal-title" style="color:var(--warning)">⚠️ 上書きの確認</div>
+            <div class="modal-body" id="confirm-modal-body">
+                指定されたファイル名は既に存在します。上書きしてもよろしいですか？
+            </div>
+            <div class="modal-actions">
+                <button class="btn" onclick="closeConfirmModal(false)">キャンセル</button>
+                <button class="btn btn-primary" onclick="closeConfirmModal(true)">上書きして発行</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ══════════════════════════════════════
+        // Config & Storage
+        // ══════════════════════════════════════
+        const STORAGE_KEY_PAT = 'tetra_github_pat';
+        const STORAGE_KEY_USER = 'tetra_github_user';
+        const STORAGE_KEY_OWNER = 'tetra_github_owner';
+        const STORAGE_KEY_REPO = 'tetra_github_repo';
+        const BRANCH = 'main';
+
+        function getGithubOwner() {
+            return sessionStorage.getItem(STORAGE_KEY_OWNER) || localStorage.getItem(STORAGE_KEY_OWNER) || 'mgu-tetra';
+        }
+
+        function getGithubRepo() {
+            return sessionStorage.getItem(STORAGE_KEY_REPO) || localStorage.getItem(STORAGE_KEY_REPO) || 'mgu-tetra.github.io';
+        }
+
+        function getToken() {
+            return sessionStorage.getItem(STORAGE_KEY_PAT);
+        }
+
+        // ══════════════════════════════════════
+        // State
+        // ══════════════════════════════════════
+        let currentSalt = '';
+        let currentIdentity = '';
+        let confirmResolver = null;
+        let knownAssertions = [
+            { slug: 'iriuchishima', path: 'assertions/iriuchishima.json' }
+        ];
+
+        // ══════════════════════════════════════
+        // Init
+        // ══════════════════════════════════════
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Default date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('issued-on').value = today;
+
+            // Generate initial random salt
+            regenerateSalt();
+
+            // Check & Restore Auth
+            restoreAuth();
+
+            // Load existing assertions list
+            await loadAssertionsList();
+
+            // Load initial badge data
+            handleBadgeSelect();
+
+            // Initial JSON update
+            updateAssertion();
+        });
+
+        // ══════════════════════════════════════
+        // Cryptography & Hash Calculation
+        // ══════════════════════════════════════
+        function generateSalt() {
+            const bytes = new Uint8Array(16);
+            window.crypto.getRandomValues(bytes);
+            return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        function regenerateSalt() {
+            currentSalt = generateSalt();
+            document.getElementById('recipient-salt').value = currentSalt;
+            handleEmailInput();
+        }
+
+        async function computeIdentity(email, salt) {
+            const normalized = email.trim().toLowerCase();
+            if (!normalized) return '';
+
+            const encoder = new TextEncoder();
+            const data = encoder.encode(normalized + salt);
+            const hashBuffer = await window.crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            return `sha256$${hashHex}`;
+        }
+
+        async function handleEmailInput() {
+            const email = document.getElementById('recipient-email').value;
+            const salt = document.getElementById('recipient-salt').value;
+            const identityElem = document.getElementById('computed-identity');
+
+            if (!email.trim()) {
+                currentIdentity = '';
+                identityElem.textContent = 'sha256$（メールアドレスを入力してください）';
+                identityElem.style.color = '#999';
+            } else {
+                currentIdentity = await computeIdentity(email, salt);
+                identityElem.textContent = currentIdentity;
+                identityElem.style.color = '#d1fae5';
+            }
+
+            // Auto-suggest slug if empty
+            const slugInput = document.getElementById('recipient-slug');
+            if (!slugInput.value && email.includes('@')) {
+                const autoSlug = email.split('@')[0].replace(/[^a-zA-Z0-9_-]/g, '').toLowerCase();
+                slugInput.value = autoSlug;
+            }
+
+            updateAssertion();
+        }
+
+        // ══════════════════════════════════════
+        // Badge Handling
+        // ══════════════════════════════════════
+        async function handleBadgeSelect() {
+            const select = document.getElementById('badge-select');
+            const customGroup = document.getElementById('custom-badge-group');
+            let badgeUrl = select.value;
+
+            if (badgeUrl === 'custom') {
+                customGroup.style.display = 'block';
+                badgeUrl = document.getElementById('custom-badge-url').value;
+            } else {
+                customGroup.style.display = 'none';
+            }
+
+            if (badgeUrl && badgeUrl !== 'custom') {
+                try {
+                    // Try to fetch local or remote badge to populate preview
+                    const localPath = badgeUrl.replace('https://mgu-tetra.github.io/', '../');
+                    const res = await fetch(localPath);
+                    if (res.ok) {
+                        const data = await res.json();
+                        document.getElementById('badge-name-label').textContent = data.name || '名称未設定';
+                        document.getElementById('badge-desc-label').textContent = data.description || '';
+                        if (data.image) {
+                            document.getElementById('badge-img').src = data.image.replace('https://mgu-tetra.github.io/', '../');
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Could not fetch badge metadata:', e);
+                }
+            }
+
+            updateAssertion();
+        }
+
+        function getSelectedBadgeUrl() {
+            const select = document.getElementById('badge-select');
+            if (select.value === 'custom') {
+                return document.getElementById('custom-badge-url').value.trim();
+            }
+            return select.value;
+        }
+
+        // ══════════════════════════════════════
+        // JSON Generation & Live Preview
+        // ══════════════════════════════════════
+        function getAssertionObject() {
+            const slug = document.getElementById('recipient-slug').value.trim() || 'example';
+            const owner = getGithubOwner();
+            const repo = getGithubRepo();
+            const domain = owner === 'mgu-tetra' && repo === 'mgu-tetra.github.io' 
+                ? 'https://mgu-tetra.github.io' 
+                : `https://${owner}.github.io/${repo}`;
+
+            const assertionId = `${domain}/assertions/${slug}.json`;
+            const badgeUrl = getSelectedBadgeUrl() || `${domain}/badges/leader_01.json`;
+            const dateVal = document.getElementById('issued-on').value;
+            const issuedOn = dateVal ? `${dateVal}T00:00:00Z` : new Date().toISOString();
+
+            return {
+                "@context": "https://w3id.org/openbadges/v2",
+                "type": "Assertion",
+                "id": assertionId,
+                "recipient": {
+                    "type": "email",
+                    "hashed": true,
+                    "salt": currentSalt,
+                    "identity": currentIdentity || "sha256$..."
+                },
+                "issuedOn": issuedOn,
+                "badge": badgeUrl,
+                "verification": {
+                    "type": "HostedBadge"
+                }
+            };
+        }
+
+        function updateAssertion() {
+            const obj = getAssertionObject();
+            document.getElementById('json-preview').textContent = JSON.stringify(obj, null, 2);
+        }
+
+        function newAssertion() {
+            document.getElementById('recipient-email').value = '';
+            document.getElementById('recipient-slug').value = '';
+            document.getElementById('issued-on').value = new Date().toISOString().split('T')[0];
+            regenerateSalt();
+            showToast('新規作成フォームを準備しました');
+        }
+
+        // ══════════════════════════════════════
+        // Export Actions (Copy / Download)
+        // ══════════════════════════════════════
+        function copyJson() {
+            const jsonText = document.getElementById('json-preview').textContent;
+            navigator.clipboard.writeText(jsonText).then(() => {
+                showToast('JSONをクリップボードにコピーしました！', 'success');
+            }).catch(() => {
+                showToast('コピーに失敗しました', 'error');
+            });
+        }
+
+        function downloadJson() {
+            const obj = getAssertionObject();
+            const slug = document.getElementById('recipient-slug').value.trim() || 'assertion';
+            const blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${slug}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast(`${slug}.json をダウンロードしました`, 'success');
+        }
+
+        // ══════════════════════════════════════
+        // GitHub API Integration & Direct Commit
+        // ══════════════════════════════════════
+        async function loadAssertionsList() {
+            const container = document.getElementById('assertions-list');
+            container.innerHTML = '';
+
+            const token = getToken();
+            const owner = getGithubOwner();
+            const repo = getGithubRepo();
+
+            if (token) {
+                try {
+                    const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/assertions`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (res.ok) {
+                        const files = await res.json();
+                        knownAssertions = files
+                            .filter(f => f.name.endsWith('.json'))
+                            .map(f => ({ slug: f.name.replace('.json', ''), path: f.path }));
+                    }
+                } catch (e) {
+                    console.warn('Could not fetch assertions from GitHub API:', e);
+                }
+            }
+
+            // Render list
+            knownAssertions.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'assertion-item';
+                div.innerHTML = `
+                    <div class="item-id">📄 ${item.slug}.json</div>
+                    <div class="item-date">${item.path}</div>
+                `;
+                div.onclick = () => loadExistingAssertion(item);
+                container.appendChild(div);
+            });
+        }
+
+        async function loadExistingAssertion(item) {
+            try {
+                const res = await fetch(`../${item.path}?t=${Date.now()}`);
+                if (!res.ok) throw new Error();
+                const data = await res.json();
+
+                document.getElementById('recipient-slug').value = item.slug;
+                if (data.issuedOn) {
+                    document.getElementById('issued-on').value = data.issuedOn.split('T')[0];
+                }
+                if (data.recipient) {
+                    currentSalt = data.recipient.salt || '';
+                    document.getElementById('recipient-salt').value = currentSalt;
+                    currentIdentity = data.recipient.identity || '';
+                    const identityElem = document.getElementById('computed-identity');
+                    identityElem.textContent = currentIdentity;
+                    identityElem.style.color = '#d1fae5';
+                    document.getElementById('recipient-email').value = '';
+                    document.getElementById('recipient-email').placeholder = '（ハッシュ化済みのためメールアドレスは非表示）';
+                }
+                if (data.badge) {
+                    const select = document.getElementById('badge-select');
+                    let found = false;
+                    for (let i = 0; i < select.options.length; i++) {
+                        if (select.options[i].value === data.badge) {
+                            select.selectedIndex = i;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        select.value = 'custom';
+                        document.getElementById('custom-badge-group').style.display = 'block';
+                        document.getElementById('custom-badge-url').value = data.badge;
+                    }
+                    handleBadgeSelect();
+                }
+                updateAssertion();
+                showToast(`${item.slug}.json を読み込みました`);
+            } catch {
+                showToast('ファイルの読み込みに失敗しました', 'error');
+            }
+        }
+
+        async function publishToGitHub() {
+            const token = getToken();
+            if (!token) {
+                openAuthModal();
+                showToast('GitHub Personal Access Token を設定してください', 'error');
+                return;
+            }
+
+            const slug = document.getElementById('recipient-slug').value.trim();
+            if (!slug) {
+                showToast('受領者識別スラッグ（ファイル名）を入力してください', 'error');
+                return;
+            }
+
+            const email = document.getElementById('recipient-email').value.trim();
+            if (!email && !currentIdentity) {
+                showToast('受領者メールアドレスを入力してください', 'error');
+                return;
+            }
+
+            const owner = getGithubOwner();
+            const repo = getGithubRepo();
+            const filePath = `assertions/${slug}.json`;
+            const publishBtn = document.getElementById('publish-btn');
+
+            publishBtn.disabled = true;
+            publishBtn.textContent = '🚀 発行中...';
+
+            try {
+                // Check if file already exists
+                let sha = null;
+                const checkRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (checkRes.ok) {
+                    const existingData = await checkRes.json();
+                    sha = existingData.sha;
+                    const confirmOverwrite = await askConfirm(
+                        `ファイル "${filePath}" は既にリポジトリに存在します。\n本当に上書きコミットしますか？`
+                    );
+                    if (!confirmOverwrite) {
+                        publishBtn.disabled = false;
+                        publishBtn.textContent = '🚀 GitHub に直接発行（コミット）';
+                        return;
+                    }
+                }
+
+                // Prepare Content
+                const obj = getAssertionObject();
+                const jsonStr = JSON.stringify(obj, null, 2);
+                const encodedContent = btoa(unescape(encodeURIComponent(jsonStr)));
+
+                const putBody = {
+                    message: `Issue Open Badge assertion for ${slug}`,
+                    content: encodedContent,
+                    branch: BRANCH
+                };
+                if (sha) putBody.sha = sha;
+
+                const putRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(putBody)
+                });
+
+                if (!putRes.ok) {
+                    const err = await putRes.json();
+                    throw new Error(err.message || 'Commit failed');
+                }
+
+                showToast(`🎉 ${filePath} を GitHub に直接コミットしました！`, 'success');
+                await loadAssertionsList();
+            } catch (err) {
+                showToast(`コミットに失敗しました: ${err.message}`, 'error');
+            } finally {
+                publishBtn.disabled = false;
+                publishBtn.textContent = '🚀 GitHub に直接発行（コミット）';
+            }
+        }
+
+        // ══════════════════════════════════════
+        // Auth Management (SessionStorage Only)
+        // ══════════════════════════════════════
+        function restoreAuth() {
+            const token = getToken();
+            const user = sessionStorage.getItem(STORAGE_KEY_USER);
+            if (token && user) {
+                setAuthUI(true, user);
+            } else if (token) {
+                validateToken(token);
+            } else {
+                setAuthUI(false);
+            }
+        }
+
+        async function validateToken(token) {
+            try {
+                const res = await fetch('https://api.github.com/user', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    sessionStorage.setItem(STORAGE_KEY_USER, data.login);
+                    setAuthUI(true, data.login);
+                } else {
+                    disconnectGitHub();
+                }
+            } catch {
+                setAuthUI(false);
+            }
+        }
+
+        async function connectGitHub() {
+            const token = document.getElementById('pat-input').value.trim();
+            const owner = document.getElementById('owner-input').value.trim();
+            const repo = document.getElementById('repo-input').value.trim();
+
+            if (!token || !owner || !repo) {
+                showToast('すべての項目を入力してください', 'error');
+                return;
+            }
+
+            try {
+                const res = await fetch('https://api.github.com/user', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) {
+                    showToast('無効なトークンです', 'error');
+                    return;
+                }
+                const data = await res.json();
+
+                // Store in sessionStorage (Session lifetime only for high security)
+                sessionStorage.setItem(STORAGE_KEY_PAT, token);
+                sessionStorage.setItem(STORAGE_KEY_USER, data.login);
+                sessionStorage.setItem(STORAGE_KEY_OWNER, owner);
+                sessionStorage.setItem(STORAGE_KEY_REPO, repo);
+
+                setAuthUI(true, data.login);
+                closeAuthModal();
+                showToast(`GitHub に接続しました (${data.login})`, 'success');
+                await loadAssertionsList();
+            } catch {
+                showToast('接続に失敗しました', 'error');
+            }
+        }
+
+        function disconnectGitHub() {
+            sessionStorage.removeItem(STORAGE_KEY_PAT);
+            sessionStorage.removeItem(STORAGE_KEY_USER);
+            sessionStorage.removeItem(STORAGE_KEY_OWNER);
+            sessionStorage.removeItem(STORAGE_KEY_REPO);
+            setAuthUI(false);
+            closeAuthModal();
+            showToast('GitHub から切断しました', 'success');
+        }
+
+        function setAuthUI(connected, username) {
+            const dot = document.getElementById('auth-dot');
+            const label = document.getElementById('auth-user-label');
+            const disconnectBtn = document.getElementById('disconnect-btn');
+
+            if (connected) {
+                dot.classList.add('connected');
+                label.textContent = username;
+                disconnectBtn.style.display = 'inline-flex';
+            } else {
+                dot.classList.remove('connected');
+                label.textContent = 'GitHub 未接続';
+                disconnectBtn.style.display = 'none';
+            }
+        }
+
+        function openAuthModal() {
+            document.getElementById('pat-input').value = getToken() || '';
+            document.getElementById('owner-input').value = getGithubOwner();
+            document.getElementById('repo-input').value = getGithubRepo();
+            document.getElementById('auth-modal').classList.add('open');
+        }
+
+        function closeAuthModal() {
+            document.getElementById('auth-modal').classList.remove('open');
+        }
+
+        // ══════════════════════════════════════
+        // Confirmation Modal & Toast
+        // ══════════════════════════════════════
+        function askConfirm(message) {
+            return new Promise((resolve) => {
+                confirmResolver = resolve;
+                document.getElementById('confirm-modal-body').innerText = message;
+                document.getElementById('confirm-modal').classList.add('open');
+            });
+        }
+
+        function closeConfirmModal(result) {
+            document.getElementById('confirm-modal').classList.remove('open');
+            if (confirmResolver) {
+                confirmResolver(result);
+                confirmResolver = null;
+            }
+        }
+
+        function showToast(message, type = '') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast show ${type}`;
+            setTimeout(() => {
+                toast.className = 'toast';
+            }, 3200);
+        }
+    </script>
+</body>
+
+</html>
