@@ -663,13 +663,12 @@
                 <div class="section-card">
                     <div class="section-card-title">
                         <span>1. 授与するバッジ（BadgeClass）</span>
+                        <button class="btn btn-sm" onclick="syncBadgesList(true)" title="badges フォルダを再スキャンして最新化">🔄 リロード</button>
                     </div>
                     <div class="form-group">
-                        <label for="badge-select">バッジの種類</label>
+                        <label for="badge-select">バッジの種類 <span id="badge-loading-status" style="font-size:11px; font-weight:normal; color:var(--text-secondary); margin-left:6px;"></span></label>
                         <select id="badge-select" onchange="handleBadgeSelect()">
-                            <option value="https://mgu-tetra.github.io/badges/leader_01.json">Tetra 第1期 代表 認証 (leader_01.json)</option>
-                            <option value="https://mgu-tetra.github.io/badges/leader.json">Tetra 第1期 幹部役員 (leader.json)</option>
-                            <option value="custom">カスタムURLを入力...</option>
+                            <option value="">バッジを読み込み中...</option>
                         </select>
                     </div>
                     <div class="form-group" id="custom-badge-group" style="display: none;">
@@ -852,11 +851,11 @@
             // Check & Restore Auth
             restoreAuth();
 
+            // Sync badges from badges directory automatically
+            await syncBadgesList();
+
             // Load existing assertions list
             await loadAssertionsList();
-
-            // Load initial badge data
-            handleBadgeSelect();
 
             // Initial JSON update
             updateAssertion();
@@ -915,6 +914,118 @@
         }
 
         // ══════════════════════════════════════
+        // Dynamic Badge Synchronization
+        // ══════════════════════════════════════
+        let availableBadges = [];
+
+        async function syncBadgesList(showNotification = false) {
+            const statusLabel = document.getElementById('badge-loading-status');
+            const select = document.getElementById('badge-select');
+            const previousSelection = select.value;
+
+            if (statusLabel) statusLabel.textContent = '（同期中...）';
+
+            const token = getToken();
+            const owner = getGithubOwner();
+            const repo = getGithubRepo();
+            let badgeFiles = [];
+
+            // 1. Try GitHub API
+            try {
+                const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+                const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/badges?t=${Date.now()}`, { headers });
+                if (res.ok) {
+                    const data = await res.json();
+                    badgeFiles = data
+                        .filter(f => f.name.endsWith('.json'))
+                        .map(f => f.name);
+                }
+            } catch (e) {
+                console.warn('GitHub API badges fetch failed:', e);
+            }
+
+            // 2. Fallback to scanning known/common file list if GitHub API failed or returned empty
+            if (!badgeFiles || badgeFiles.length === 0) {
+                const candidates = [
+                    'executive_01.json', 'executive_02.json',
+                    'leader_01.json', 'leader_02.json',
+                    'leader.json', 'member_01.json', 'test.json'
+                ];
+                const checks = await Promise.allSettled(
+                    candidates.map(async name => {
+                        const r = await fetch(`../badges/${name}?t=${Date.now()}`);
+                        if (r.ok) return name;
+                        throw new Error();
+                    })
+                );
+                badgeFiles = checks
+                    .filter(c => c.status === 'fulfilled')
+                    .map(c => c.value);
+            }
+
+            // 3. Fetch each badge JSON to retrieve "name", "description", "image", "id"
+            availableBadges = [];
+            for (const filename of badgeFiles) {
+                try {
+                    const res = await fetch(`../badges/${filename}?t=${Date.now()}`);
+                    if (res.ok) {
+                        const badgeData = await res.json();
+                        const badgeId = badgeData.id || `https://mgu-tetra.github.io/badges/${filename}`;
+                        availableBadges.push({
+                            id: badgeId,
+                            filename: filename,
+                            name: badgeData.name || filename,
+                            description: badgeData.description || '',
+                            image: badgeData.image || '',
+                            criteria: badgeData.criteria || null
+                        });
+                    }
+                } catch (e) {
+                    console.warn(`Failed to parse badge: ${filename}`, e);
+                }
+            }
+
+            // 4. Populate <select>
+            select.innerHTML = '';
+            if (availableBadges.length === 0) {
+                const opt = document.createElement('option');
+                opt.value = '';
+                opt.textContent = 'バッジが見つかりませんでした';
+                select.appendChild(opt);
+            } else {
+                availableBadges.forEach(b => {
+                    const opt = document.createElement('option');
+                    opt.value = b.id;
+                    opt.textContent = `${b.name} (${b.filename})`;
+                    select.appendChild(opt);
+                });
+            }
+
+            // Always add custom URL option
+            const customOpt = document.createElement('option');
+            customOpt.value = 'custom';
+            customOpt.textContent = 'カスタムURLを入力...';
+            select.appendChild(customOpt);
+
+            // Restore selection if exists, else select first badge
+            if (previousSelection && Array.from(select.options).some(o => o.value === previousSelection)) {
+                select.value = previousSelection;
+            } else if (availableBadges.length > 0) {
+                select.selectedIndex = 0;
+            }
+
+            if (statusLabel) {
+                statusLabel.textContent = `（${availableBadges.length} 件検出）`;
+            }
+
+            await handleBadgeSelect();
+
+            if (showNotification) {
+                showToast(`${availableBadges.length} 件のバッジを同期しました`, 'success');
+            }
+        }
+
+        // ══════════════════════════════════════
         // Badge Handling
         // ══════════════════════════════════════
         async function handleBadgeSelect() {
@@ -929,9 +1040,16 @@
                 customGroup.style.display = 'none';
             }
 
-            if (badgeUrl && badgeUrl !== 'custom') {
+            // Check if we already have it in availableBadges
+            const cached = availableBadges.find(b => b.id === badgeUrl);
+            if (cached) {
+                document.getElementById('badge-name-label').textContent = cached.name || '名称未設定';
+                document.getElementById('badge-desc-label').textContent = cached.description || '';
+                if (cached.image) {
+                    document.getElementById('badge-img').src = cached.image.replace('https://mgu-tetra.github.io/', '../');
+                }
+            } else if (badgeUrl && badgeUrl !== 'custom') {
                 try {
-                    // Try to fetch local or remote badge to populate preview
                     const localPath = badgeUrl.replace('https://mgu-tetra.github.io/', '../');
                     const res = await fetch(localPath);
                     if (res.ok) {
@@ -1261,7 +1379,7 @@
                 setAuthUI(true, data.login);
                 closeAuthModal();
                 showToast(`GitHub に接続しました (${data.login})`, 'success');
-                await loadAssertionsList();
+                await Promise.all([syncBadgesList(), loadAssertionsList()]);
             } catch {
                 showToast('接続に失敗しました', 'error');
             }
