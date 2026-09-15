@@ -1,0 +1,251 @@
+\documentclass[10.5pt,a4paper]{ltjsarticle}
+
+% --- パッケージ読み込み ---
+\usepackage{luatexja-fontspec}
+\usepackage[top=16mm, bottom=16mm, left=18mm, right=18mm]{geometry}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{hyperref}
+
+% --- 色の定義 ---
+\definecolor{TetraBlue}{HTML}{0A84FF}
+\definecolor{TetraDarkBlue}{HTML}{005BB5}
+\definecolor{TextDark}{HTML}{1A1A1A}
+\definecolor{TextSecondary}{HTML}{555555}
+\definecolor{LightBg}{HTML}{F8FAFC}
+\definecolor{CardBg}{HTML}{F1F5F9}
+\definecolor{BoxBorder}{HTML}{CBD5E1}
+\definecolor{AlertRed}{HTML}{DC2626}
+\definecolor{AlertBg}{HTML}{FEF2F2}
+\definecolor{AlertBorder}{HTML}{FCA5A5}
+\definecolor{SuccessGreen}{HTML}{16A34A}
+
+% --- ハイパーリンク設定 ---
+\hypersetup{
+    colorlinks=true,
+    linkcolor=TetraDarkBlue,
+    urlcolor=TetraBlue,
+    pdftitle={Tetra オープンバッジ授与のお知らせ＆受領・保管ガイド},
+    pdfauthor={明治学院大学 任意団体 Tetra}
+}
+
+% --- 余白・行間・段落設定 ---
+\setlength{\parskip}{0.25em}
+\setlength{\parindent}{0pt}
+\linespread{1.14}
+
+% --- tcolorbox スタイル定義 ---
+\newtcolorbox{infoframe}[1][]{
+    enhanced,
+    colback=LightBg,
+    colframe=BoxBorder,
+    left=9pt, right=9pt, top=6pt, bottom=6pt,
+    arc=3pt,
+    boxrule=0.7pt,
+    borderline west={3pt}{0pt}{TetraBlue},
+    #1
+}
+
+\newtcolorbox{alertframe}[1][]{
+    enhanced,
+    colback=AlertBg,
+    colframe=AlertBorder,
+    left=9pt, right=9pt, top=6pt, bottom=6pt,
+    arc=3pt,
+    boxrule=0.7pt,
+    borderline west={3pt}{0pt}{AlertRed},
+    #1
+}
+
+\newtcolorbox{stepcard}[2][]{
+    enhanced,
+    colback=white,
+    colframe=BoxBorder,
+    left=9pt, right=9pt, top=5pt, bottom=5pt,
+    arc=3pt,
+    boxrule=0.7pt,
+    title={\textbf{#2}},
+    coltitle=TetraDarkBlue,
+    colbacktitle=CardBg,
+    fonttitle=\bfseries\normalsize,
+    attach boxed title to top left={yshift=-2mm, xshift=3mm},
+    boxed title style={boxrule=0.7pt, colframe=BoxBorder, arc=2pt},
+    #1
+}
+
+% --- セクション見出しのカスタム装飾 ---
+\newcommand{\mysection}[1]{%
+    \vspace{2mm}%
+    {\fontsize{12pt}{14pt}\selectfont\bfseries\color{TetraDarkBlue}%
+    \rule[-2pt]{3pt}{12pt}\hspace{5pt}#1}%
+    \vspace{1.5mm}%
+}
+
+\begin{document}
+
+% ══════════════════════════════════════════════════════════
+% 1ページ目：お知らせ ＆ オープンバッジの概要
+% ══════════════════════════════════════════════════════════
+
+\begin{center}
+    {\fontsize{9.5pt}{11pt}\selectfont\color{TextSecondary} 明治学院大学 任意団体 Tetra 公式認定ドキュメント} \\[1.5mm]
+    {\fontsize{17pt}{20pt}\selectfont\bfseries\color{TetraDarkBlue} オープンバッジ授与のお知らせ} \\[1mm]
+    {\fontsize{12.5pt}{15pt}\selectfont\bfseries\color{TextDark} 兼 デジタル証明書の受領・承認・保管ガイド} \\[1.5mm]
+    {\fontsize{9pt}{11pt}\selectfont\color{TextSecondary} 発行元：明治学院大学 任意団体 Tetra 幹部会 \quad | \quad 発行日：2026年9月}
+\end{center}
+
+\vspace{0.5mm}
+\hrule height 0.8pt \relax
+\vspace{1.5mm}
+
+\mysection{1. はじめに（オープンバッジ授与のご案内）}
+
+このたびは、学生団体 Tetra（テトラ）における組織運営および各種活動・プロジェクトへの多大なるご尽力、誠にありがとうございました。
+
+Tetra では、役員およびメンバーが果たした役割や獲得したリーダーシップ・技術的知見を客観的・公式に証明するため、世界標準規格に基づいたデジタル証明書\textbf{「オープンバッジ（Open Badges）」}を発行・授与することといたしました。
+
+本バッジは、紙の賞状とは異なり、受領者自身が生涯にわたって保有・管理できるデジタル資産です。就職活動のエントリーシート（ES）や LinkedIn、個人ポートフォリオ等で世界共通の公式証明として提示することができます。
+
+\mysection{2. オープンバッジ（Open Badges）とは}
+
+オープンバッジは、国際技術標準化団体「1EdTech（旧 IMS Global Learning Consortium）」が策定した、個人の知識・スキル・経験をオンライン上で証明・検証するための国際規格です。
+
+\begin{infoframe}
+    \textbf{オープンバッジの3大メリット：}
+    \begin{itemize}[leftmargin=14pt, itemsep=1.5pt, topsep=1.5pt]
+        \item \textbf{高い信頼性と改ざん防止}：発行元組織（Tetra公式ドメイン）と受領者の情報が暗号技術で結びついており、偽造が不可能です。
+        \item \textbf{透明性のある授与基準}：どのような任期や活動基準（Criteria）を満たして獲得したバッジなのかを、第三者がオンライン上で直接検証できます。
+        \item \textbf{個人のポータビリティ}：大学卒業後も失効せず、個人のバッジウォレットで永久に一元管理できます。
+    \end{itemize}
+\end{infoframe}
+
+\mysection{3. 授与されるバッジの基本情報}
+
+\vspace{1mm}
+\begin{center}
+    \renewcommand{\arraystretch}{1.2}
+    \fontsize{9pt}{12pt}\selectfont
+    \begin{tabular}{p{3.6cm} p{11.8cm}}
+        \toprule
+        \textbf{項目} & \textbf{内容} \\
+        \midrule
+        \textbf{発行組織 (Issuer)} & 明治学院大学 任意団体 Tetra (URL: \url{https://mgu-tetra.github.io}) \\
+        \textbf{認証バッジ種別} & 代表 認証 (\texttt{leader\_01.json}) / 幹部 認証 (\texttt{executive\_01.json}) 等 \\
+        \textbf{授与基準 (Criteria)} & 役員選任、任期中の定例会議運営および行事統括、次期への業務引継ぎ完了 \\
+        \textbf{受領証明 (Assertion)} & 個別発行された JSON URL（例：\texttt{https://mgu-tetra.github.io/assertions/【お名前】.json}） \\
+        \textbf{検証方式} & 1EdTech / W3C 準拠 HostedBadge（オープンWeb検証対応） \\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+\newpage
+
+% ══════════════════════════════════════════════════════════
+% 2ページ目：受領者がバッジを受け取って承認・保管する方法
+% ══════════════════════════════════════════════════════════
+
+\mysection{4. バッジの受領・承認・保管手順（受領者向けステップバイステップ）}
+
+オープンバッジを自分のウォレットに受け取り、公式に保有・承認するための具体的な手順です。\\
+世界中で広く利用され、完全日本語対応している公式バッジウォレット\textbf{「Open Badge Passport（オープンバッジ・パスポート）」}を使用します。
+
+\vspace{1mm}
+
+\begin{alertframe}
+    \textbf{\color{AlertRed}【最重要】メールアドレスに関するご注意} \\
+    バッジの受領者照合は、暗号ハッシュ技術（SHA-256）によって行われます。\\
+    ウォレットサービスに登録するメールアドレスは、必ず\textbf{大学から付与されている「学籍メールアドレス（\texttt{@meijigakuin.ac.jp}）」}をご使用ください。私用のアドレス等、学籍メール以外のアドレスでは「本人不一致」と判定され、バッジをインポートできません。
+\end{alertframe}
+
+\vspace{1.5mm}
+
+\begin{stepcard}{STEP 1：ご自身の Assertion URL の確認}
+    Tetra より案内された、あなた専用のバッジ証明 URL（Assertion URL）を手元に用意します。
+    \begin{itemize}[leftmargin=14pt, itemsep=0.5pt, topsep=1pt]
+        \item URL 形式：\url{https://mgu-tetra.github.io/assertions/<お名前>.json}
+        \item （例：\url{https://mgu-tetra.github.io/assertions/kosugi.json}）
+    \end{itemize}
+\end{stepcard}
+
+\vspace{1.5mm}
+
+\begin{stepcard}{STEP 2：Open Badge Passport アカウントの作成（無料）}
+    PCのブラウザまたはスマートフォンのブラウザからウォレットを開きます。
+    \begin{enumerate}[leftmargin=14pt, itemsep=0.5pt, topsep=1pt]
+        \item 公式サイトにアクセス：\url{https://openbadgepassport.com/}
+        \item 画面右上の「\textbf{サインアップ}（アカウント作成）」をクリックします。
+        \item \textbf{学籍メールアドレス（\texttt{@meijigakuin.ac.jp}）}を入力し、パスワードを設定して登録を完了します。
+    \end{enumerate}
+\end{stepcard}
+
+\vspace{1.5mm}
+
+\begin{stepcard}{STEP 3：バッジのインポート（受け取り・承認）}
+    ウォレット内でバッジ URL を入力し、真正性の照合と承認を行います。
+    \begin{enumerate}[leftmargin=14pt, itemsep=0.5pt, topsep=1pt]
+        \item Open Badge Passport にログイン後、上部メニューの「\textbf{バッジ}」$\rightarrow$「\textbf{バッジのインポート}」を開きます。
+        \item 「\textbf{URL からインポート}」タブを選択します。
+        \item STEP 1 の\textbf{ご自身の Assertion URL} を入力枠に貼り付け、「\textbf{インポート}」ボタンを押します。
+        \item システムがメールアドレスと暗号ハッシュを自動照合し、\textbf{「認証成功（有効なバッジ）」}として正式に承認・登録されます。
+    \end{enumerate}
+\end{stepcard}
+
+\vspace{1.5mm}
+
+\begin{stepcard}{STEP 4：受領確認と公開範囲の設定}
+    ウォレット内の「マイスペース」に授与されたバッジ（公式画像）が表示されていることを確認します。\\
+    バッジの公開設定を「公開」にすることで、外部（SNSや就職活動先）へシェアできるようになります。
+\end{stepcard}
+
+\newpage
+
+% ══════════════════════════════════════════════════════════
+% 3ページ目：活用方法 ＆ FAQ ＆ 連絡先
+% ══════════════════════════════════════════════════════════
+
+\mysection{5. オープンバッジの活用方法（就活・キャリア・SNS）}
+
+授与されたバッジは、単なる画像ではなく、オンラインで即座に検証可能な実績として活用できます。
+
+\begin{itemize}[leftmargin=14pt, itemsep=4pt]
+    \item \textbf{LinkedIn の「資格・認定」欄へのワンクリック追加}：\\
+    Open Badge Passport 内の「シェア」メニューから、ワンクリックで LinkedIn プロフィールに公式認定として追加できます。採用担当者や閲覧者がリンクをクリックすると、Tetra 公式が発行した証明書ページが直接表示されます。
+    \item \textbf{就職活動（エントリーシート・履歴書・ポートフォリオ）での提示}：\\
+    バッジの公開 URL や QR コードを Web 履歴書や GitHub、Notion ポートフォリオに掲載することで、「学生団体において代表・幹部として組織を牽引した実績」を客観的・公式な証拠として提示できます。
+    \item \textbf{バッジ画像（ベイクド画像）のダウンロードと持ち運び}：\\
+    ウォレットからダウンロードできる PNG 画像には、メタデータとして証明データが埋め込まれています（Bake機能）。画像ファイルを相手に送信するだけでも、対応ツールで真偽の確認が可能です。
+\end{itemize}
+
+\mysection{6. よくあるご質問 (FAQ)}
+
+\textbf{Q1. メールアドレスがインターネット上に勝手に公開されてしまう心配はありませんか？} \\
+\textbf{A.} 心配ありません。当団体のバッジデータ内では、メールアドレスにランダムな文字列（ソルト）を付与した上で、不可逆な暗号ハッシュ（SHA-256）に変換されています。第三者がデータを見ても元のメールアドレスを復元・逆算することはできません。
+
+\vspace{1.5mm}
+
+\textbf{Q2. バッジのインポート時に「受領者不一致」またはエラーになります。} \\
+\textbf{A.} Open Badge Passport に登録・ログインしているメールアドレスが、ご自身の\textbf{学籍メールアドレス（\texttt{@meijigakuin.ac.jp}）}と完全に一致しているかご確認ください（個人のGmailなど別のアドレスになっていると照合に失敗します）。
+
+\vspace{1.5mm}
+
+\textbf{Q3. 第三者はどのようにしてこのバッジの真正性を確かめることができますか？} \\
+\textbf{A.} 国際標準化団体 1EdTech の公式検証サイト「\url{https://badgecheck.io/}」等にバッジの Assertion URL を入力することで、Tetra公式ドメインから発行された真正な証明書であることを誰でも瞬時に確認できます。
+
+\vspace{6mm}
+\hrule height 0.8pt \relax
+\vspace{2.5mm}
+
+% --- お問い合わせ先 ---
+\begin{center}
+    {\fontsize{9pt}{12pt}\selectfont\color{TextSecondary}
+    \textbf{【本件に関するお問い合わせ・ご相談窓口】}\\[1mm]
+    明治学院大学 任意団体 Tetra（テトラ） 幹部会\\
+    公式Webサイト: \url{https://mgu-tetra.github.io} \quad / \quad 連絡先: \texttt{mgtetra@ed.meijigakuin.ac.jp}
+    }
+\end{center}
+
+\end{document}
