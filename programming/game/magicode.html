@@ -19,6 +19,18 @@
         </div>
       </div>
       <div id="unity-warning" role="alert"></div>
+      <div id="touch-controls" hidden>
+        <div id="touch-dpad" role="group" aria-label="移動">
+          <span class="touch-dpad-arrow touch-dpad-up" aria-hidden="true">▲</span>
+          <span class="touch-dpad-arrow touch-dpad-down" aria-hidden="true">▼</span>
+          <span class="touch-dpad-arrow touch-dpad-left" aria-hidden="true">◀</span>
+          <span class="touch-dpad-arrow touch-dpad-right" aria-hidden="true">▶</span>
+        </div>
+        <div id="touch-buttons">
+          <button type="button" class="touch-button touch-button-reset" data-key="reset" tabindex="-1" aria-label="リセット（長押し）">リセット<br>長押し</button>
+          <button type="button" class="touch-button touch-button-action" data-key="action" tabindex="-1" aria-label="決定・拾う・置く">決定</button>
+        </div>
+      </div>
       </div>
       <div id="unity-footer">
         <div id="unity-logo-title-footer"></div>
@@ -33,6 +45,9 @@
       var stage = document.querySelector("#unity-stage");
       var loadingBar = document.querySelector("#unity-loading-bar");
       var fullscreenButton = document.querySelector("#unity-fullscreen-button");
+      var touchControls = document.querySelector("#touch-controls");
+      var dpad = document.querySelector("#touch-dpad");
+      var touchButtonColumn = document.querySelector("#touch-buttons");
 
       function unityShowBanner(msg, type) {
         var banner = document.querySelector("#unity-warning");
@@ -51,7 +66,16 @@
 
       // Size only the CSS box. Unity owns the rendering buffer and pixel density.
       function resizeCanvas() {
-        var width = Math.min(stage.clientWidth, stage.clientHeight * 16 / 9);
+        // In landscape, keep the touch controls in side gutters instead of over the game.
+        var gutterLeft = 0;
+        var gutterRight = 0;
+        if (!touchControls.hidden && stage.clientWidth > stage.clientHeight) {
+          gutterLeft = dpad.offsetLeft + dpad.offsetWidth + 8;
+          gutterRight = stage.clientWidth - touchButtonColumn.offsetLeft + 8;
+        }
+        stage.style.paddingLeft = gutterLeft + "px";
+        stage.style.paddingRight = gutterRight + "px";
+        var width = Math.min(stage.clientWidth - gutterLeft - gutterRight, stage.clientHeight * 16 / 9);
         canvas.style.width = width + "px";
         canvas.style.height = width * 9 / 16 + "px";
       }
@@ -102,6 +126,120 @@
       document.addEventListener("webkitfullscreenchange", fullscreenChanged);
       canvas.addEventListener("pointerdown", function () { canvas.focus(); });
 
+      // Touch controls replay the game's keyboard bindings as synthetic key events.
+      // Unity reads key/code for the Input System and keyCode for legacy input.
+      var TOUCH_KEYS = {
+        up: { key: "ArrowUp", code: "ArrowUp", keyCode: 38 },
+        down: { key: "ArrowDown", code: "ArrowDown", keyCode: 40 },
+        left: { key: "ArrowLeft", code: "ArrowLeft", keyCode: 37 },
+        right: { key: "ArrowRight", code: "ArrowRight", keyCode: 39 },
+        action: { key: " ", code: "Space", keyCode: 32 },
+        reset: { key: "r", code: "KeyR", keyCode: 82 },
+      };
+      var touchButtons = touchControls.querySelectorAll("[data-key]");
+      var heldKeys = {};
+      var gameReady = false;
+
+      function sendKey(type, name) {
+        var def = TOUCH_KEYS[name];
+        var event = new KeyboardEvent(type, { key: def.key, code: def.code, bubbles: true, cancelable: true });
+        Object.defineProperty(event, "keyCode", { value: def.keyCode });
+        Object.defineProperty(event, "which", { value: def.keyCode });
+        window.dispatchEvent(event);
+      }
+      function pressKey(name) {
+        if (heldKeys[name]) return;
+        heldKeys[name] = true;
+        sendKey("keydown", name);
+      }
+      function releaseKey(name) {
+        if (!heldKeys[name]) return;
+        delete heldKeys[name];
+        sendKey("keyup", name);
+      }
+
+      var dpadPointer = null;
+      var dpadDir = null;
+      function setDpadDir(dir) {
+        if (dir === dpadDir) return;
+        if (dpadDir) releaseKey(dpadDir);
+        dpadDir = dir;
+        if (dir) {
+          pressKey(dir);
+          dpad.setAttribute("data-dir", dir);
+        } else {
+          dpad.removeAttribute("data-dir");
+        }
+      }
+      // Grid movement: only the dominant axis counts, with a small dead zone in the middle.
+      function dpadDirAt(event) {
+        var rect = dpad.getBoundingClientRect();
+        var x = event.clientX - (rect.left + rect.width / 2);
+        var y = event.clientY - (rect.top + rect.height / 2);
+        if (Math.max(Math.abs(x), Math.abs(y)) < rect.width * 0.12) return null;
+        if (Math.abs(x) > Math.abs(y)) return x > 0 ? "right" : "left";
+        return y > 0 ? "down" : "up";
+      }
+      dpad.addEventListener("pointerdown", function (event) {
+        event.preventDefault();
+        dpadPointer = event.pointerId;
+        dpad.setPointerCapture(event.pointerId);
+        setDpadDir(dpadDirAt(event));
+      });
+      dpad.addEventListener("pointermove", function (event) {
+        if (event.pointerId === dpadPointer) setDpadDir(dpadDirAt(event));
+      });
+      function endDpad(event) {
+        if (event.pointerId !== dpadPointer) return;
+        dpadPointer = null;
+        setDpadDir(null);
+      }
+      dpad.addEventListener("pointerup", endDpad);
+      dpad.addEventListener("pointercancel", endDpad);
+      dpad.addEventListener("lostpointercapture", endDpad);
+
+      Array.prototype.forEach.call(touchButtons, function (button) {
+        var name = button.getAttribute("data-key");
+        button.addEventListener("pointerdown", function (event) {
+          event.preventDefault();
+          button.setPointerCapture(event.pointerId);
+          button.classList.add("is-pressed");
+          pressKey(name);
+        });
+        function end() {
+          button.classList.remove("is-pressed");
+          releaseKey(name);
+        }
+        button.addEventListener("pointerup", end);
+        button.addEventListener("pointercancel", end);
+        button.addEventListener("lostpointercapture", end);
+      });
+
+      // Never leave a key stuck down when the page loses focus mid-press.
+      function releaseAllKeys() {
+        dpadPointer = null;
+        setDpadDir(null);
+        Array.prototype.forEach.call(touchButtons, function (button) { button.classList.remove("is-pressed"); });
+        Object.keys(heldKeys).forEach(releaseKey);
+      }
+      window.addEventListener("blur", releaseAllKeys);
+      document.addEventListener("visibilitychange", function () {
+        if (document.hidden) releaseAllKeys();
+      });
+      touchControls.addEventListener("contextmenu", function (event) { event.preventDefault(); });
+
+      function isTouchDevice() {
+        return (window.matchMedia && window.matchMedia("(any-pointer: coarse)").matches) || navigator.maxTouchPoints > 0;
+      }
+      function showTouchControls() {
+        if (!gameReady || !touchControls.hidden) return;
+        touchControls.hidden = false;
+        resizeCanvas();
+      }
+      window.addEventListener("pointerdown", function (event) {
+        if (event.pointerType === "touch") showTouchControls();
+      });
+
       var buildUrl = "Build";
       var loaderUrl = buildUrl + "/MagiCode WebGL Build.loader.js";
       var config = {
@@ -133,6 +271,8 @@
           }).then(function () {
             loadingBar.style.display = "none";
             fullscreenButton.disabled = false;
+            gameReady = true;
+            if (isTouchDevice()) showTouchControls();
             resizeCanvas();
             canvas.focus();
           }).catch(startupFailed);
